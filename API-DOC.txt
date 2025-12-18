@@ -1,0 +1,335 @@
+Get Case with count
+Method Get
+http://127.0.0.1:8000/api/cases/show/count/{user_id}
+------------------------------------------------------------
+
+Get Case details with product id 
+Method Get
+http://127.0.0.1:8000/api/cases/list/{fi_type}/{product_id}/{user_id}
+------------------------------------------------------------
+
+Get Case details with cases_fi_types id 
+Method Get
+http://127.0.0.1:8000/api/cases/{case_fi_type_id}
+------------------------------------------------------------
+
+Get Case details with cases_fi_types id 
+Method POST
+http://127.0.0.1:8000/api/cases/update
+
+case_fi_type_id
+latitude
+longitude
+image[]
+----------------------------------------------------------------
+
+Get Case details with cases_fi_types id 
+Method POST
+http://127.0.0.1:8000/api/cases/uploadSignature
+
+case_fi_type_id
+agency_signature
+------------------------------------------------------------
+
+Get Case details with cases_fi_types id 
+Method POST
+http://127.0.0.1:8000/api/cases/submit
+
+RV Payload
+{
+    "case_fi_type_id"   : "2",
+    "fi_type_id"        : "1",
+    "address_confirmed": "aaaaaaaaaa",
+    "address_confirmed_by": "aaaaaaaaaa",
+    "no_of_residents_in_house": "1234",
+    "person_met": "aaaaaaaaaa",
+    "relationship": "aaaaaaaaaa",
+    "year_of_establishment": "2",
+    "no_of_earning_family_members": "2",
+    "residence_status": "aaaaaaaaaa",
+    "name_of_employer": "aaaaaaaaaa",
+    "employer_address": "aaaaaaaaaa",
+    "telephone_no_residence": "aaaaaaaaaa",
+    "relationship_others": "aaaaaaaaaa",
+    "years_at_current_residence_others": "aaaaaaaaaa",
+    "no_of_earning_family_members_others": "aaaaaaaaaa",
+    "residence_status_others": "aaaaaaaaaa",
+    "verification_conducted_at_others": "aaaaaaaaaa",
+    "office": "aaaaaaaaaa",
+    "approx_value": "10.00",
+    "approx_rent": "10.00",
+    "designation": "aaaaaaaaaa",
+    "bank_name": "aaaaaaaaaa",
+    "branch": "aaaaaaaaaa",
+    "permanent_address": "aaaaaaaaaa",
+    "vehicles": "aaaaaaaaaa",
+    "make_and_type": "aaaaaaaaaa",
+    "location": "aaaaaaaaaa",
+    "locality": "aaaaaaaaaa",
+    "accomodation_type": "aaaaaaaaaa",
+    "interior_conditions": "aaaaaaaaaa",
+    "assets_seen": "aaaaaaaaaa",
+    "area": "aaaaaaaaaa",
+    "standard_of_living": "aaaaaaaaaa",
+    "nearest_landmark": "aaaaaaaaaa",
+    "house_locked": "aaaaaaaaaa",
+    "locked_person_met": "aaaaaaaaaa",
+    "locked_relationship": "aaaaaaaaaa",
+    "applicant_age": "22",    
+    "occupation": "aaaaaaaaaa",
+    "untraceable": "aaaaaaaaaa",
+    "verifiers_name": "aaaaaaaaaa",
+    "verification_conducted_at": "aaaaaaaaaa",
+    "proof_attached": "aaaaaaaaaa",
+    "type_of_proof": "aaaaaaaaaa",
+    "employement_details": "aaaaaaaaaa",
+    "comments": "aaaaaaaaaa",
+    "consolidated_remarks": "aaaaaaaaaa",
+    "remarks": "aaaaaaaaaa",
+    "recommended": "aaaaaaaaaa",
+    "date_of_visit": "aaaaaaaaaa",
+    "time_of_visit": "aaaaaaaaaa",
+    "latitude": "22.2222",
+    "longitude": "11.1111",
+    "tcp1_name": "aaa",
+    "tcp1_checked_with": "aaa",
+    "tcp1_negative_comments": "aaa",
+    "tcp2_name": "aaa",
+    "tcp2_checked_with": "aaa",
+    "tcp2_negative_comments": "aaa",
+    "status":"2",
+    "to_whom_does_address_belong": "aaaa",
+    "is_applicant_know_to_person" : "aaaa",
+    "other_stability_year_details" : "1111",
+    "negative_feedback_reason" : ""
+}
+BV Payload
+{
+        "case_fi_type_id"   : "2",
+        "fi_type_id"        : "2",
+        "mobile":"aaaaa",
+        "address":"aaaaa",
+        "address_confirmed":"aaaaa",
+        "employer_address":"aaaaa",
+        "type_of_proof":"aaaaa",
+        "address_confirmed_by":"aaaaa",
+        "name_of_employer":"aaaaa",
+        "person_met":"aaaaa",
+        "website_of_employer":"aaaaa",
+        "email_of_employer":"aaaaa",
+        "telephono_no_office":"aaaaa",
+        "ext":"aaaaa",
+        "telephone_no_residence":"aaaaa",
+        "co_board_outside_bldg_office":"aaaaa",
+        "type_of_employer":"aaaaa",
+        "nature_of_employer":"aaaaa",
+        "line_of_business":"aaaaa",        
+        "level_of_business_activity":"aaaaa",
+        "no_of_employees":"10",
+        "no_of_branches":"2",
+        "office_ambience":"aaaaa",
+        "type_of_locality":"aaaaa",
+        "area":"aaaaa",
+        "nearest_landmark":"aaaaa",
+        "// ease_of_locating":"aaaaa",
+        "terms_of_employment":"aaaaa",
+        "grade":"aaaaa",
+        "year_of_establishment":"2",
+        "applicant_age":"32",
+        "name_of_employer_co":"aaaaa",
+        "established":"aaaaa",
+        "designation":"aaaaa",
+        "date_of_visit":"2020-01-01",
+        "time_of_visit":"11:11",
+        "latitude":"22.22",
+        "longitude":"33.33",
+        "tcp1_name":"aaaaa",
+        "tcp1_checked_with":"aaaaa",
+        "tcp2_name":"aaaaa",
+        "tcp2_checked_with":"aaaaa",
+        "visited_by":"aaaaa",
+        "verified_by":"aaaaa"
+        "address_confirmation_status":"aaaaaaaa",
+        "address_of_employer_co":"aaaaaaaa",
+        "designation_other":"aaaaaaaa",
+        "type_industry":"aaaaaaaa",
+        "residence_number":"aaaaaaaa",
+        "type_of_profession":"aaaaaaaa",
+        "year_of_establishment_of_business":"aaaaaaaa",
+        "year_of_employment":"aaaaaaaa",
+        "verifier_feedback":"aaaaaaaa",
+
+}
+-------------------------------------------------------------------------------------------------------
+
+
+not done
+drop column : visit_conducted
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+done
+
+  ALTER TABLE `cases_fi_types` CHANGE `status` `status` ENUM('0','1','2','3','4','5','6','7','8') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '0->new,1->inprogress,2->positive_resolved,3->negative_resolved, 4->positive_verified,5->negative_verified,6->hold, 7->close, 8->duplicate';
+
+  ALTER TABLE `cases_fi_types` CHANGE `residence_number` `residence_number` VARCHAR(100) NULL DEFAULT NULL;
+  ALTER TABLE `cases_fi_types` CHANGE `no_of_employees` `no_of_employees` VARCHAR(100) NULL DEFAULT NULL;
+
+
+year_of_establishment drop column
+
+years_lived_at_this_residence
+
+ALTER TABLE `cases_fi_types` ADD `residence_number` INT(11) NULL AFTER `no_of_earning_family_members`;
+ALTER TABLE `cases_fi_types` ADD `designation_other` VARCHAR(255) NULL AFTER `designation`;
+
+
+
+
+
+
+
+
+
+ALTER TABLE `cases_fi_types` ADD `scheduled_visit_date` DATETIME NULL AFTER `status`;
+
+ALTER TABLE `cases` ADD `date_of_birth` DATE NULL AFTER `applicant_name`;
+
+ALTER TABLE `cases_fi_types` ADD `address_confirmed` VARCHAR(255) NULL AFTER `user_id`, ADD `address_confirmed_by` VARCHAR(255) NULL AFTER `addres_confirmed`, ADD `person_met` VARCHAR(255) NULL AFTER `address_confirmed_by`, ADD `relationship` VARCHAR(255) NULL AFTER `person_met`, ADD `no_of_residents_in_the_house` VARCHAR(255) NULL AFTER `relationship`, ADD `years_at_current_residence` VARCHAR(255) NULL AFTER `no_of_residents_in_the_house`, ADD `no_of_earning_family_members` VARCHAR(255) NULL AFTER `years_at_current_residence`, ADD `residence_status` VARCHAR(255) NULL AFTER `no_of_earning_family_members`, ADD `name_of_employer` VARCHAR(255) NULL AFTER `residence_status`, ADD `employer_address` VARCHAR(255) NULL AFTER `name_of_employer`, ADD `telephone_no_residence` VARCHAR(255) NULL AFTER `employer_address`;
+
+ALTER TABLE `cases_fi_types` ADD `office` VARCHAR(255) NULL AFTER `scheduled_visit_date`, ADD `approx_value` VARCHAR(255) NULL AFTER `office`, ADD `approx_rent` VARCHAR(255) NULL AFTER `approx_value`, ADD `designation` VARCHAR(255) NULL AFTER `approx_rent`, ADD `bank_name` VARCHAR(255) NULL AFTER `designation`, ADD `branch` VARCHAR(255) NULL AFTER `bank_name`, ADD `permanent_address` VARCHAR(255) NULL AFTER `branch`, ADD `vehicles` VARCHAR(255) NULL AFTER `permanent_address`, ADD `make_and_type` VARCHAR(255) NULL AFTER `vehicles`, ADD `location` VARCHAR(255) NULL AFTER `make_and_type`, ADD `locality` VARCHAR(255) NULL AFTER `location`;
+
+ALTER TABLE `cases_fi_types` ADD `accomodation_type` VARCHAR(255) NULL AFTER `locality`, ADD `interior_conditions` VARCHAR(255) NULL AFTER `accomodation_type`, ADD `assets_seen` VARCHAR(255) NULL AFTER `interior_conditions`, ADD `area` VARCHAR(255) NULL AFTER `assets_seen`, ADD `standard_of_living` VARCHAR(255) NULL AFTER `area`, ADD `nearest_landmark` VARCHAR(255) NULL AFTER `standard_of_living`, ADD `house_locked` ENUM('0','1') NULL AFTER `nearest_landmark`, ADD `locked_person_met` VARCHAR(255) NULL AFTER `house_locked`, ADD `locked_relationship` VARCHAR(255) NULL AFTER `locked_person_met`, ADD `applicant_age` VARCHAR(255) NULL AFTER `locked_relationship`, ADD `no_of_residents_in_house` VARCHAR(255) NULL AFTER `applicant_age`;
+
+
+
+
+
+ALTER TABLE `cases_fi_types` CHANGE `status` `status` ENUM('0','1','2','3','4','5','6','7') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '\'0->new,\'1->inprogress,2->positive_resolved,3->negative_resolved, 4->positive_verified,5->negative_verified\',6->hold, 7->close';
+ALTER TABLE `cases_fi_types` CHANGE `status` `status` ENUM('0','1','2','3','4','5','6','7') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '0->new,1->inprogress,2->positive_resolved,3->negative_resolved, 4->positive_verified,5->negative_verified,6->hold, 7->close';
+
+
+ALTER TABLE `cases_fi_types` ADD `sub_status` INT(11) NULL DEFAULT NULL AFTER `status`;
+
+
+ALTER TABLE `case_status` ADD `parent_id` INT(11) NOT NULL AFTER `updated_at`, ADD `type` INT(11) NOT NULL AFTER `parent_id`;
+ALTER TABLE `case_status` CHANGE `parent_id` `parent_id` INT(11) NOT NULL AFTER `id`, CHANGE `type` `type` INT(11) NOT NULL AFTER `name`
+
+
+
+ALTER TABLE `cases` DROP `guarantee_name`;
+ALTER TABLE `cases` CHANGE `co_applicant_name` `co_applicant_name` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL AFTER `applicant_name`
+ALTER TABLE `cases_fi_types` ADD `relationship_others` VARCHAR(255) NULL AFTER `updated_at`, ADD `years_at_current_residence_others` VARCHAR(255) NULL AFTER `relationship_others`, ADD `no_of_earning_family_members_others` VARCHAR(255) NULL AFTER `years_at_current_residence_others`, ADD `residence_status_others` VARCHAR(255) NULL AFTER `no_of_earning_family_members_others`, ADD `verification_conducted_at_others` VARCHAR(255) NULL AFTER `residence_status_others`;
+
+
+
+ALTER TABLE `cases_fi_types`
+  DROP `neighbour_check_1`,
+  DROP `neighbour1_checked_with`;
+
+ALTER TABLE `cases_fi_types` ADD `tcp1_name` VARCHAR(255) NULL DEFAULT NULL AFTER `residence_status_others`, ADD `tcp1_checked_with` VARCHAR(255) NULL DEFAULT NULL AFTER `tcp1_name`, ADD `tcp1_negative_comments` VARCHAR(255) NULL DEFAULT NULL AFTER `tcp1_checked_with`, ADD `tcp2_name` VARCHAR(255) NULL DEFAULT NULL AFTER `tcp1_negative_comments`, ADD `tcp2_checked_with` VARCHAR(255) NULL DEFAULT NULL AFTER `tcp2_name`, ADD `tcp2_negative_comments` VARCHAR(255) NULL DEFAULT NULL AFTER `tcp2_checked_with`;
+ALTER TABLE `cases_fi_types` ADD `website_ of_employer` VARCHAR(255) NULL DEFAULT NULL AFTER `verification_conducted_at_others`, ADD `email_of_employer` VARCHAR(255) NULL DEFAULT NULL AFTER `website_ of_employer`, ADD `co_board_outside_bldg_office` VARCHAR(255) NULL DEFAULT NULL AFTER `email_of_employer`, ADD `line_of_business` VARCHAR(255) NULL DEFAULT NULL AFTER `co_board_outside_bldg_office`, ADD `year_of_establishment` VARCHAR(255) NULL DEFAULT NULL AFTER `line_of_business`, ADD `level_of_business_activity` VARCHAR(255) NULL DEFAULT NULL AFTER `year_of_establishment`, ADD `no_of_employees` VARCHAR(255) NULL DEFAULT NULL AFTER `level_of_business_activity`, ADD `no_of_branches_offices` VARCHAR(255) NULL DEFAULT NULL AFTER `no_of_employees`, ADD `office_ambience_look` VARCHAR(255) NULL DEFAULT NULL AFTER `no_of_branches_offices`, ADD `type_of_locality` VARCHAR(255) NULL DEFAULT NULL AFTER `office_ambience_look`, ADD `nearest_landmark` VARCHAR(255) NULL DEFAULT NULL AFTER `type_of_locality`, ADD `ease_of_locating` VARCHAR(255) NULL DEFAULT NULL AFTER `nearest_landmark`, ADD `terms_of_employment` VARCHAR(255) NULL DEFAULT NULL AFTER `ease_of_locating`, ADD `grade` VARCHAR(255) NULL DEFAULT NULL AFTER `terms_of_employment`, ADD `name_of_employer_co` VARCHAR(255) NULL DEFAULT NULL AFTER `grade`, ADD `established` VARCHAR(255) NULL DEFAULT NULL AFTER `name_of_employer_co`, ADD `telephono_no_office` VARCHAR(255) NULL DEFAULT NULL AFTER `established`, ADD `ext` VARCHAR(255) NULL DEFAULT NULL AFTER `telephono_no_office`, ADD `type_of_employer` VARCHAR(255) NULL DEFAULT NULL AFTER `ext`, ADD `nature_of_employer` VARCHAR(255) NULL DEFAULT NULL AFTER `type_of_employer`, ADD `no_of_employees` VARCHAR(255) NULL DEFAULT NULL AFTER `nature_of_employer`, ADD `no_of_branches` VARCHAR(255) NULL DEFAULT NULL AFTER `no_of_employees`, ADD `applicant_age` VARCHAR(255) NULL DEFAULT NULL AFTER `no_of_branches`, ADD `nearest_landmark` VARCHAR(255) NULL DEFAULT NULL AFTER `applicant_age`, ADD `not_recommended` VARCHAR(255) NULL DEFAULT NULL AFTER `nearest_landmark`, ADD `nature_of_business` VARCHAR(255) NULL DEFAULT NULL AFTER `not_recommended`, ADD `type_of_employer_co` VARCHAR(255) NULL DEFAULT NULL AFTER `nature_of_business`;
+
+
+
+
+
+
+
+
+
+Get Banks
+Method Get
+http://127.0.0.1:8000/api/getBank
+
+------------------------------------------------------------
+Get Product
+Method Get
+http://127.0.0.1:8000/api/getProduct/1
+
+------------------------------------------------------------
+Get FI Type
+Method Get
+http://127.0.0.1:8000/api/getFiType
+
+------------------------------------------------------------
+Create Case
+Method POST
+http://127.0.0.1:8000/api/cases/create
+------------------------------------------------------------
+{
+  "bank_id": "1",
+  "product_id": "1",
+  "fi_type_id": [
+    {
+      "id": "1",
+      "address": "Address1",
+      "pincode": "2013011",
+      "phone_number": "9876543211",
+      "landmark": "Landmark1",
+      "agent": "1"
+    },
+    {
+      "id": "2",
+      "address": "Address2",
+      "pincode": "2013012",
+      "phone_number": "9876543212",
+      "landmark": "Landmark2",
+      "agent": "1"
+    },
+    {
+      "address": "Address3",
+      "pincode": "2013013",
+      "phone_number": "9876543213",
+      "landmark": "Landmark3",
+      "agent": null
+    },
+    {
+      "address": "Address4",
+      "pincode": "2013014",
+      "phone_number": "9876543214",
+      "landmark": "Landmark4",
+      "agent": null
+    },
+    {
+      "address": "Address5",
+      "pincode": "2013015",
+      "phone_number": "9876543215",
+      "landmark": "Landmark5",
+      "agent": null
+    }
+  ],
+  "application_type": "1",
+  "refrence_number": "EP01010",
+  "applicant_name": "Susheel Sahoo",
+  "amount": "100000",
+  "vehicle": "Honda",
+  "co_applicant_name": "Joyti Sahu",
+  "guarantee_name": "Ankit Sahu",
+  "singleAgent": null,
+  "geo_limit": "Local",
+  "tat_time": "00:55",
+  "remarks": "Test Remark"
+}
+
+------------------------------------------------------------
