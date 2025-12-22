@@ -16,14 +16,12 @@
         <input type="hidden" name="case_fi_id" value="{{ $case->id }}" />
         <table class="table table-bordered">
             <tbody>
+                
                 <tr>
-                    <td colspan="4" class="text-center">
-                        <h4>Axis Bank Field Verification Report</h4>
-                        <small>Field Credit Unit (FCU)</small>
+                    <td style="border:none;font-size:22px;color:#0094ff" class="text-center" colspan="2">
+                        <img alt="Synergee Risk Pvt Ltd." style="width: 150px" src="{{ asset('logos/synergeerisk-logo.png') }}">
                     </td>
-                </tr>
-                <tr class="bg-info text-white">
-                    <td colspan="4" class="subheading text-center"><strong>Report Header Information</strong></td>
+                    <td class="address_text align-middle text-white" style="background: #3fbaf7;" align="center" colspan="2"><h4 class="text-white">Synergee Risk Pvt Ltd.</h4></td>
                 </tr>
                 <tr>
                     <td>FCU Agency Name</td>
@@ -170,23 +168,6 @@
                 <tr>
                     <td>Residence Profile</td>
                     <td colspan="3"><textarea name="residence_profile" class="form-control" rows="3">{{ $case->residence_profile ?? '' }}</textarea></td>
-                </tr>
-                <tr>
-                    <td>Verification Status</td>
-                    <td colspan="3">
-                        <select name="verification_status" class="form-control">
-                            <option value="">--Select--</option>
-                            <option value="Positive" {{ ($case->verification_status ?? '') === 'Positive' ? 'selected' : '' }}>Positive</option>
-                            <option value="Negative" {{ ($case->verification_status ?? '') === 'Negative' ? 'selected' : '' }}>Negative</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr class="bg-info text-white">
-                    <td colspan="4" class="subheading text-center"><strong>Authentication</strong></td>
-                </tr>
-                <tr>
-                    <td>Authorized Signatory</td>
-                    <td colspan="3"><input type="text" name="authorized_signatory" class="form-control" value="{{ $case->authorized_signatory ?? '' }}" placeholder="Signature of Authorized Signatory with Agency Seal"></td>
                 </tr>
                 <tr>
                     <td colspan="4" class="text-center"><input type="submit" value="Update BV Case" class="btn btn-primary updateBtn btn-sm"></td>
