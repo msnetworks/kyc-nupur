@@ -159,7 +159,7 @@ class DashboardController extends Controller
                                                   $userCount[$userId]['close'];
                 }
             });
-        \Log::info('User counts:', $userCount);
+        // \Log::info('User counts:', $userCount); 
         return $userCount;
     }
 
