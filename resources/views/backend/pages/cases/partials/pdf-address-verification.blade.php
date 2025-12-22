@@ -90,20 +90,21 @@
 
 <div class="col-xs-12" style="width: 100%; max-width: 100%; margin: 0; padding: 5px; border: 2px solid #9d1d3f;">
     <table class="table table-bordered" border="2">
-        <tbody>
-            <tr class="axis-head">
-                <td colspan="4" class="text-center">
-                    <h2 class="axis-title">Axis Bank - Field Credit Unit Report</h2>
-                    <div class="axis-meta">Strictly Private &amp; Confidential</div>
+        <thead>
+            <tr>
+                <td style="border:none; font-size:22px; color:#000;" align="center" colspan="2">
+                    <img style="width: 180px;" alt="Synergee Risk Management Pvt. Ltd." src="{{ $logo }}">
+                </td>
+                <td class="address_text" align="center" colspan="2">
+                    <h5 style="color: #ff0000; margin-bottom: 0;"><u>
+                        Synergee Risk Management Pvt. Ltd.</u></h5>
+                        <small>G-75, Jagjeet Nagar, East Delhi, Delhi, India, 110053</small>
                 </td>
             </tr>
-        </tbody>
-    </table>
-
-    <table class="table table-bordered" border="2">
+        </thead>
         <tbody>
             <tr class="subheading">
-                <td colspan="4" class="text-center">Report Header Information</td>
+                <td colspan="4" class="text-center">Address Verification</td>
             </tr>
             <tr>
                 <td>FCU Agency Name</td>
@@ -260,8 +261,13 @@
                     Signature of Authorized Signatory (With Agency Seal)
                 </td>
                 <td style="width: 50%; text-align:center">
-                    <div style="min-height: 40px; font-weight: 600;">{{ $case->authorized_signatory ?? 'NA' }}</div>
-                    <small>Authorized Signatory Name</small>
+                    {{-- <div style="min-height: 40px; font-weight: 600;">{{ $case->authorized_signatory ?? 'NA' }}</div> --}}
+                    <img title="image"
+                        style="width:150px; margin-bottom:5px; margin-left:5px; border:2px solid #b06c1c; border-radius:10px;"
+                        src="{{ $sign }}" />
+                        <br>
+
+                    Authorized Signatory Name
                 </td>
             </tr>
         </tbody>

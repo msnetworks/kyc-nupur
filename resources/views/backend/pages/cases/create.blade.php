@@ -312,6 +312,33 @@ Create Case Create - Admin Panel
         var baseUrl = "{{ url('/') }}";
         $('#selectBank').on('change', function(e) {
             var bankId = $(this).val();
+
+            // If bank id is 12, show ONLY BV checkbox (value 8) and hide/disable others; restore otherwise
+            if (bankId == '12' || bankId === 12) {
+                $('input[name^="fi_type_id"]').each(function() {
+                    var val = $(this).val();
+                    var $formCheck = $(this).closest('.form-check');
+                    if (val == '8') { // BV
+                        $formCheck.show();
+                        $(this).prop('disabled', false);
+                    } else {
+                        $formCheck.hide();
+                        $(this).prop('checked', false).prop('disabled', true);
+                        var rel = $(this).attr('rel-name');
+                        if (rel) {
+                            $('#field' + rel).hide();
+                            $('#field' + rel + ' input').val('');
+                        }
+                    }
+                });
+            } else {
+                $('input[name^="fi_type_id"]').each(function() {
+                    var $formCheck = $(this).closest('.form-check');
+                    $formCheck.show();
+                    $(this).prop('disabled', false);
+                });
+            }
+
             var customGetPath = "{{ route('admin.case.item','ID')}}";
             customGetPath = customGetPath.replace('ID', bankId);
             $.ajax({
@@ -332,8 +359,12 @@ Create Case Create - Admin Panel
                         });
                     });
                 },
-                error: function() {
-                    alert('Request failed');
+                error: function(xhr, status, error) {
+                    console.error('AJAX error', {status: status, error: error, xhr: xhr});
+                    var message = 'Request failed';
+                    if (xhr.status) message += ': ' + xhr.status + ' ' + xhr.statusText;
+                    if (xhr.responseText) message += '\n' + xhr.responseText;
+                    // alert(message);
                 }
             });
         });
@@ -377,6 +408,8 @@ Create Case Create - Admin Panel
             }
         });
 
+        // Apply bank-specific FI Type visibility on page load (handles pre-selected bank)
+        $('#selectBank').trigger('change');
     });
 </script>
 <script>
@@ -411,9 +444,6 @@ Create Case Create - Admin Panel
         }
     });
 });
-
-</script>
-<script>
 
 </script>
 @endsection
