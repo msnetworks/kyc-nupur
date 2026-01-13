@@ -55,11 +55,9 @@ class CasesController extends Controller
 
         // Check if the logged-in admin is a "Bank" role
         if (Auth::guard('admin')->check() && in_array(Auth::guard('admin')->user()->role, ['Bank', 'Admin', 'Manager'])) {
-            // Paginate cases created by this admin - 25 per page
-            $cases = Cases::where("created_by", Auth::guard('admin')->user()->id)->paginate(25);
+            $cases = Cases::where("created_by", Auth::guard('admin')->user()->id)->get();
         } else {
-            // Paginate all cases - 25 per page
-            $cases = Cases::paginate(50);
+            $cases = Cases::all();
         }
 
         // Fetch all banks (products)
@@ -246,13 +244,13 @@ class CasesController extends Controller
         CaseHistoryHelper::logHistory($cases_id, null, null, null, 'New Case', 'Case Create', 'New Case Created');
 
         session()->flash('success', 'Case has been created !!');
-        return redirect()->back();
+        return redirect()->route('admin.case.index');
         
         }
         else{
             session()->flash('error', 'Please Select Case has been created !!');
-        return redirect()->back();
-        } 
+        return redirect()->route('admin.case.index');
+        }
     }
 
     /**
@@ -337,7 +335,7 @@ class CasesController extends Controller
             $fitypesFeild .= '</div>';
         }
 
-        // LogHelper::logActivity('Show Case', 'User show case.');
+        LogHelper::logActivity('Show Case', 'User show case.');
 
         return view('backend.pages.cases.show', compact('cases', 'banks', 'roles', 'fitypes', 'fitypesFeild', 'ApplicationTypes', 'fi_type_ids', 'AvailbleProduct'));
     }
@@ -1107,8 +1105,6 @@ class CasesController extends Controller
                 $img = Image::make(public_path($filePath));
                 $img->resize(1500, 2000);
 
-                // Old overlay/table approach (kept commented per request)
-                /*
                 // Table properties
                 $tableStartX = 50;
                 $tableStartY = $img->height() - 500;
@@ -1118,56 +1114,6 @@ class CasesController extends Controller
 
                 // Draw table and add text
                 $this->addTextToImage($img, $tableStartX, $tableStartY, $rowHeight, $tableWidth, $latitude, $longitude, $latlong_address, $dateTime);
-                */
-
-                // New: add white background at bottom with padding and dynamic font sizing
-                $origWidth = $img->width();
-                $origHeight = $img->height();
-                $padding = 15; // left/top padding inside the extra area
-                $rightPadding = 40; // extra right padding specifically for the information area
-                // font size proportional to image width (1500px ~ 28px)
-                $fontSize = max(16, intval($origWidth / 54));
-                $fontPath = public_path('fonts/ARIAL.TTF');
-
-                // Prepare bottom text lines
-                $lines = [];
-                if (!empty(trim($latlong_address))) {
-                    $lines[] = 'Address: ' . trim($latlong_address);
-                }else {
-                    $lines[] = 'Address: N/A';
-                }
-                $lines[] = 'Latitude: ' . ($latitude ?? '');
-                $lines[] = 'Longitude: ' . ($longitude ?? '');
-                $lines[] = 'Date: ' . $dateTime;
-                $bottomText = implode("\n", $lines);
-
-                // Wrap the bottom text to the available width inside padding and extra right padding
-                $wrapWidth = $origWidth - ($padding + $rightPadding);
-                $wrappedBottom = $this->wrapText($img, $bottomText, $wrapWidth, $fontSize, $fontPath);
-
-                // Calculate required height for the wrapped text (approx using fontSize)
-                $linesCount = substr_count($wrappedBottom, "\n") + 1;
-                $lineHeight = intval($fontSize * 1.4);
-                $requiredAreaHeight = ($linesCount * $lineHeight) + ($padding * 2);
-                $extraHeight = max(100, $requiredAreaHeight);
-
-                $newHeight = $origHeight + $extraHeight;
-
-                // Create white canvas and insert original image at the top-left
-                $canvas = Image::canvas($origWidth, $newHeight, '#ffffff');
-                $canvas->insert($img, 'top-left', 0, 0);
-
-                // Write text into the white area (left aligned, top aligned within the extra area)
-                $canvas->text($wrappedBottom, $padding, $origHeight + $padding, function ($font) use ($fontPath, $fontSize) {
-                    $font->file($fontPath);
-                    $font->size($fontSize);
-                    $font->color('#000000');
-                    $font->align('left');
-                    $font->valign('top');
-                });
-
-                // Use new canvas as the final image
-                $img = $canvas;
 
                 $img->save(public_path($filePath));
 
@@ -1228,62 +1174,86 @@ class CasesController extends Controller
 
     private function addTextToImage($img, $tableStartX, $tableStartY, $rowHeight, $tableWidth, $latitude, $longitude, $latlong_address, $dateTime)
     {
-        $col1Width = $img->width() * 0.25;
-        $col2Width = $img->width() * 0.72;
-        $tableWidth = $col1Width + $col2Width;
+        $col1Width = $img->width() * 0.25; // 25% for the first column
+        $col2Width = $img->width() * 0.72; // 72% for the second column
+        $padding = $img->width() * 0.03; // 3% for the second column
+        $tableWidth = $col1Width + $col2Width - $padding;
+        $tableHeight = $rowHeight * 4;
 
-        $fontPath = public_path('fonts/ARIAL.TTF');
-        $rows = [
-            ['label' => 'Address', 'value' => $this->wrapText($img, (string) $latlong_address, $col2Width - 40, 40, $fontPath)],
-            ['label' => 'Latitude', 'value' => (string) $latitude],
-            ['label' => 'Longitude', 'value' => (string) $longitude],
-            ['label' => 'Date', 'value' => (string) $dateTime],
-        ];
-
-        $rowCount = count($rows);
-        $tableHeight = $rowHeight * $rowCount;
-
-        $styleLabel = function ($font) use ($fontPath) {
-            $font->file($fontPath);
-            $font->size(40);
-            $font->color('#FFFFFF');
-            $font->align('left');
-            $font->valign('middle');
-        };
-
-        $styleValue = function ($font) use ($fontPath) {
-            $font->file($fontPath);
-            $font->size(40);
-            $font->color('#FFFFFF');
-            $font->align('left');
-            $font->valign('top');
-        };
-
+        // Draw background rectangle for the table
         $img->rectangle(
             $tableStartX,
             $tableStartY,
             $tableStartX + $tableWidth,
             $tableStartY + $tableHeight,
             function ($draw) {
-                $draw->background([0, 0, 0, 0.5]);
+                $draw->background([0, 0, 0, 0.5]); // Semi-transparent black
             }
         );
+        // Add Latitude
+        $img->text('Address', $tableStartX + 10, $tableStartY + $rowHeight / 2, function ($font) {
+            $font->file(public_path('fonts/ARIAL.TTF'));
+            $font->size(40);
+            $font->color('#fff'); // White text color
+            $font->align('left');
+            $font->valign('middle');
+        });
 
-        foreach ($rows as $index => $row) {
-            $rowTop = $tableStartY + ($rowHeight * $index);
-            $labelY = $rowTop + ($rowHeight / 2);
-            $valueY = $rowTop + 20;
+        $img->text($latlong_address, $tableStartX + $col1Width + 10, $tableStartY + $rowHeight / 2, function ($font) {
+            $font->file(public_path('fonts/ARIAL.TTF'));
+            $font->size(40);
+            $font->color('#fff'); // White text color
+            $font->align('left');
+            $font->valign('middle');
+        });
+        // Add Latitude
+        $img->text("Latitude", $tableStartX + 10, $tableStartY + $rowHeight + $rowHeight / 2, function ($font) {
+            $font->file(public_path('fonts/ARIAL.TTF'));
+            $font->size(40);
+            $font->color('#FFFFFF'); // White text color
+            $font->align('left');
+            $font->valign('middle');
+        });
+        $img->text($latitude, $tableStartX + $col1Width + 10, $tableStartY + $rowHeight + $rowHeight / 2, function ($font) {
+            $font->file(public_path('fonts/ARIAL.TTF'));
+            $font->size(40);
+            $font->color('#fff'); // White text color
+            $font->align('left');
+            $font->valign('middle');
+        });
 
-            $img->text($row['label'], $tableStartX + 10, $labelY, function ($font) use ($styleLabel) {
-                $styleLabel($font);
-            });
+        // Add Longitude
+        $img->text("Longitude", $tableStartX + 10, $tableStartY + $rowHeight + $rowHeight + $rowHeight / 2, function ($font) {
+            $font->file(public_path('fonts/ARIAL.TTF'));
+            $font->size(40);
+            $font->color('#fff'); // White text color
+            $font->align('left');
+            $font->valign('middle');
+        });
+        $img->text($longitude, $tableStartX + $col1Width + 10, $tableStartY + $rowHeight + $rowHeight + $rowHeight / 2, function ($font) {
+            $font->file(public_path('fonts/ARIAL.TTF'));
+            $font->size(40);
+            $font->color('#fff'); // White text color
+            $font->align('left');
+            $font->valign('middle');
+        });
 
-            $img->text($row['value'], $tableStartX + $col1Width + 10, $valueY, function ($font) use ($styleValue) {
-                $styleValue($font);
-            });
-        }
-
-        $this->drawTableBorders($img, $tableStartX, $tableStartY, $rowHeight, $rowCount, $col1Width, $col2Width);
+        $img->text('Date', $tableStartX + 10, $tableStartY + $rowHeight + $rowHeight + $rowHeight  + $rowHeight / 2, function ($font) {
+            $font->file(public_path('fonts/ARIAL.TTF'));
+            $font->size(40);
+            $font->color('#fff'); // White text color
+            $font->align('left'); // Center align text
+            $font->valign('middle');
+        });
+        $img->text($dateTime, $tableStartX + $col1Width + 10, $tableStartY + $rowHeight + $rowHeight + $rowHeight  + $rowHeight / 2, function ($font) {
+            $font->file(public_path('fonts/ARIAL.TTF'));
+            $font->size(40);
+            $font->color('#fff'); // White text color
+            $font->align('left'); // Center align text
+            $font->valign('middle');
+        });
+        // Draw table borders
+        $this->drawTableBorders($img, $tableStartX, $tableStartY, $rowHeight, 4, $col1Width, $col2Width);
     }
 
     private function getAvailableImageField($case)
@@ -2198,9 +2168,6 @@ class CasesController extends Controller
         if (array_key_exists('applicant_name', $input)) {
             $case->applicant_name = $input['applicant_name'];
         }
-        if (array_key_exists('amount', $input)) {
-            $case->amount = $input['amount'];
-        }
         $case->save();
 
         if ($case->bank_id == 12) {
@@ -2235,9 +2202,6 @@ class CasesController extends Controller
             $caseFi->residence_profile           = $input['residence_profile'] ?? $caseFi->residence_profile;
             $caseFi->verification_status         = $input['verification_status'] ?? $caseFi->verification_status;
             $caseFi->authorized_signatory        = $input['authorized_signatory'] ?? $caseFi->authorized_signatory;
-            $caseFi->latitude                    = $input['latitude'] ?? $caseFi->latitude;
-            $caseFi->longitude                   = $input['longitude'] ?? $caseFi->longitude;
-            $caseFi->latlong_address             = $input['latlong_address'] ?? $caseFi->latlong_address;
         } else {
             $caseFi->dealer_code                    = $input['dealer_code'] ?? null;
             $caseFi->landline                       = $input['landline'] ?? null;

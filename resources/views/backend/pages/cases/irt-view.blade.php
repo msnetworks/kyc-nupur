@@ -8,8 +8,8 @@
 </head>
 <body>
     <div class="container">
-        <h1>{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER4INDIALTD' }}</h1>
-        <p>{{ $case->getCase->bank_id == 13 ? 'No 752, Sainik Vihar, Saradhana Road, Kanker Khera, Meerut Uttar Pradesh - 250001' : 'VASANT KUNJ, NEW DELHI - 110070' }}</p>
+        <h1>TIGER4INDIALTD</h1>
+        <p>VASANT KUNJ, NEW DELHI - 110070</p>
         <p>STATE BANK OF INDIA</p>
         <h2>PRODUCT: ITR</h2>
         

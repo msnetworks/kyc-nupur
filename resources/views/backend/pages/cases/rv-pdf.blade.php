@@ -1,10 +1,9 @@
 @php
-$signPath = $case->getCase->bank_id == 13 ? public_path('images/flexi-sign.jpeg') : public_path('images/sign.png');
-$path = $signPath;
+$path = public_path('images/sign.png');
 $type = pathinfo($path, PATHINFO_EXTENSION);
 $data = file_get_contents($path);
 $sign = 'data:image/' . $type . ';base64,' . base64_encode($data);
-$logopath = $case->getCase->bank_id == 13 ? public_path('images/sk-logo.png') : public_path('images/logo.jpg');
+$logopath = public_path('images/logo.jpg');
 $logotype = pathinfo($logopath, PATHINFO_EXTENSION);
 $logodata = file_get_contents($logopath);
 $logo = 'data:image/' . $logotype . ';base64,' . base64_encode($logodata);
@@ -80,12 +79,12 @@ $logo = 'data:image/' . $logotype . ';base64,' . base64_encode($logodata);
         <tbody>
             <tr>
                 <td style="border:none; font-size:22px; color:#000;" align="center">
-                    <img style="width: 180px; max-height: 120px;" alt="{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }}" src="{{ $logo }}">
+                    <img style="width: 180px;" alt="TIGER 4 INDIA LTD" src="{{ $logo }}">
                 </td>
                 <td class="address_text" align="center">
                     <h2 style="color: #ff0000; margin-bottom: 0;"><u>
-                        <i>{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }}</i></u></h2>
-                        <small>{{ $case->getCase->bank_id == 13 ? 'No 752, Sainik Vihar, Saradhana Road, Kanker Khera, Meerut Uttar Pradesh - 250001' : 'VASANT KUNJ NEW DELHI-110070' }}</small>
+                        <i>TIGER 4 INDIA LTD</i></u></h2>
+                        <small>VASANT KUNJ NEW DELHI-110070</small>
                 </td>
             </tr>
             <tr>

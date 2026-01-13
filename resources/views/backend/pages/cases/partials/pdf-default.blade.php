@@ -151,19 +151,15 @@
     <table class="table table-bordered" style="width: 100%" border="2">
         <tbody>
             <tr>
-                @if($case->getCase->bank_id != 12 && $case->getCase->bank_id != 13)
+                @if($case->getCase->bank_id != 12)
                 <td style="border:none; font-size:22px; color:#000;" align="center">
-                    <img style="width: 180px; max-height: 120px;" alt="TIGER 4 INDIA LTD" src="{{ $logo }}">
-                </td>
-                @elseif($case->getCase->bank_id == 13)
-                <td style="border:none; font-size:22px; color:#000;" align="center">
-                    <img style="width: 180px; max-height: 120px;" alt="SK ENTERPRISES" src="{{ $logo }}">
+                    <img style="width: 180px;" alt="TIGER 4 INDIA LTD" src="{{ $logo }}">
                 </td>
                 @endif
                 <td class="address_text" align="center" calspan="{{ $case->getCase->bank_id == 12 ? 2 : 1 }}">
                     <h2 style="color: #ff0000; margin-bottom: 0;"><u>
-                        <i>{{ $case->getCase->bank_id == 12 ? 'Synergee Risk Management Pvt. Ltd.' : ($case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD') }}</i></u></h2>
-                        <small>{{ $case->getCase->bank_id == 13 ? 'No 752, Sainik Vihar, Saradhana Road, Kanker Khera, Meerut Uttar Pradesh - 250001' : 'VASANT KUNJ NEW DELHI-110070' }}</small>
+                        <i>{{ $case->getCase->bank_id == 12 ? 'Synergee Risk Management Pvt. Ltd.' : 'TIGER 4 INDIA LTD' }}</i></u></h2>
+                        <small>VASANT KUNJ NEW DELHI-110070</small>
                 </td>
             </tr>
             

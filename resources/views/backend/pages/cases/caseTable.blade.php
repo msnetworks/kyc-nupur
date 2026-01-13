@@ -104,8 +104,8 @@
                             <a href="javascript:;" data-row="{{ $case->id }}" class="caseClose"><img src="{{URL::asset('backend/assets/images/icons/Close.gif')}}" title="Case close"></img></a>
                         @endif
                         @endif
-                       @if(in_array($case->fi_type_id , [7,8, 14]) && auth()->user()->role != 'Bank' && $case->getCase->bank_id != 12)
-                        <a href="{{ route('admin.case.viewForm',$case->id)}}" target="_blank" class="viewForm" data-row="{{ $case->id }}"><img src="{{URL::asset('backend/assets/images/icons/verified_cases.png')}}" title="View Form"></img></a>
+                       @if(in_array($case->fi_type_id , [7,8, 14]))
+                       <a href="{{ route('admin.case.viewForm',$case->id)}}" target="_blank" class="view Form" data-row="{{ $case->id }}"><img src="{{URL::asset('backend/assets/images/icons/verified_cases.png')}}" title="View Form"></img></a>
                        @endif
                     @if(auth()->user()->role != 'Bank')
                         <a href="javascript:;" data-row="{{ $case->id }}" class="cloneCase"><img src="{{URL::asset('backend/assets/images/icons/add.png')}}" title="clone case"></img></a>

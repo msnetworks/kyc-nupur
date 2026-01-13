@@ -10,14 +10,6 @@ Cases - Admin Panel
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.3/css/responsive.jqueryui.min.css">
-<style>
-    svg.w-5 {
-        height: 15px;
-    }
-    .leading-5{
-        margin: 15px;
-    }
-</style>
 @endsection
 
 
@@ -72,7 +64,7 @@ Cases - Admin Panel
                             <tbody>
                                 @foreach ($cases as $user)
                                 <tr>
-                                    <td>{{ ($cases->firstItem() ?? 0) + $loop->index }}</td>
+                                    <td>{{ $loop->index+1 }}</td>
                                     <td>{{ $user->refrence_number }}</td>
                                     <td>{{ $user->applicant_name }}</td>
                                     <td>{{ $user->amount }}</td>
@@ -93,11 +85,6 @@ Cases - Admin Panel
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="mt-3 d-flex justify-content-center">
-                        {{ $cases->appends(request()->query())->links('vendor.pagination.custom') }}
-                    </div> 
-
                     <div class="col-md-12">
                         {{-- {{dd(session('failedRows')[0]['errors']) }} --}}
                         @if(Session::has('failedRows') && count(session('failedRows')) > 0)
@@ -143,9 +130,7 @@ Cases - Admin Panel
         ==================================*/
     if ($('#dataTable').length) {
         $('#dataTable').DataTable({
-            responsive: true,
-            paging: false,
-            info: false
+            responsive: true
         });
     }
 </script>

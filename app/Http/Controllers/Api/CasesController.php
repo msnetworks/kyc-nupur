@@ -313,67 +313,15 @@ class CasesController extends Controller
                 $img = Image::make(public_path($image_name));
                 $img->resize(1500, 2000);
     
-                // Old overlay/table approach (kept commented per request)
-                /*
                 // Table properties
                 $tableStartX = 50;
                 $tableStartY = $img->height() - 500;
                 $tableWidth = $img->width() - $tableStartX; // Total width of the table
                 $rowHeight = 100;
-
+                
 
                 // Draw table and add text
                 $this->addTextToImage($img, $tableStartX, $tableStartY, $rowHeight, $tableWidth, $latitude, $longitude, $address, $datetime);
-                */
-
-                // New: add white background at bottom with padding and dynamic font sizing
-                $origWidth = $img->width();
-                $origHeight = $img->height();
-                $padding = 15; // left/top padding inside the extra area
-                $rightPadding = 40; // extra right padding specifically for the information area
-                // font size proportional to image width (1500px ~ 28px)
-                $fontSize = max(16, intval($origWidth / 54));
-                $fontPath = public_path('fonts/ARIAL.TTF');
-
-                // Prepare bottom text lines
-                $lines = [];
-                if (!empty(trim($address))) {
-                    $lines[] = 'Address: ' . trim($address);
-                } else {
-                    $lines[] = 'Address: N/A';
-                }
-                $lines[] = 'Latitude: ' . ($latitude ?? '');
-                $lines[] = 'Longitude: ' . ($longitude ?? '');
-                $lines[] = 'Date: ' . $datetime;
-                $bottomText = implode("\n", $lines);
-
-                // Wrap the bottom text to the available width inside padding and extra right padding
-                $wrapWidth = $origWidth - ($padding + $rightPadding);
-                $wrappedBottom = $this->wrapText($img, $bottomText, $wrapWidth, $fontSize, $fontPath);
-
-                // Calculate required height for the wrapped text (approx using fontSize)
-                $linesCount = substr_count($wrappedBottom, "\n") + 1;
-                $lineHeight = intval($fontSize * 1.4);
-                $requiredAreaHeight = ($linesCount * $lineHeight) + ($padding * 2);
-                $extraHeight = max(100, $requiredAreaHeight);
-
-                $newHeight = $origHeight + $extraHeight;
-
-                // Create white canvas and insert original image at top-left
-                $canvas = Image::canvas($origWidth, $newHeight, '#ffffff');
-                $canvas->insert($img, 'top-left', 0, 0);
-
-                // Write bottom text in the added white area (top-aligned)
-                $canvas->text($wrappedBottom, $padding, $origHeight + $padding, function ($font) use ($fontPath, $fontSize) {
-                    $font->file($fontPath);
-                    $font->size($fontSize);
-                    $font->color('#000000');
-                    $font->align('left');
-                    $font->valign('top');
-                });
-
-                // Use canvas as final image
-                $img = $canvas;
                 // $this->addTextToImage($img, $tableStartX, $tableStartY, $rowHeight, $tableWidth, $latitude, $longitude, $address, $datetime);
                 $img->save(public_path($image_name));
     
@@ -515,31 +463,7 @@ class CasesController extends Controller
         // Draw table borders
         $this->drawTableBorders($img, $tableStartX, $tableStartY, $rowHeight, 4, $col1Width, $col2Width);
     
-    }
-
-    private function wrapText($img, $text, $maxWidth, $fontSize, $fontPath)
-    {
-        $wrappedText = '';
-        $words = explode(' ', $text);
-        $currentLine = '';
-
-        foreach ($words as $word) {
-            $testLine = $currentLine . $word . ' ';
-            $box = imagettfbbox($fontSize, 0, $fontPath, $testLine);
-            $lineWidth = $box[2] - $box[0];
-
-            if ($lineWidth > $maxWidth) {
-                $wrappedText .= $currentLine . "\n";
-                $currentLine = $word . ' ';
-            } else {
-                $currentLine = $testLine;
-            }
-        }
-        $wrappedText .= $currentLine;
-
-        return $wrappedText;
-    }
-
+    } 
     public function uploadSignature(Request $request)
     {
         // Create New Cases 

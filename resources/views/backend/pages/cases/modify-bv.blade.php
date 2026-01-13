@@ -3,7 +3,7 @@
 @endphp
 
 @if($bankId == 12)
-    @include('backend.pages.cases.partials.modify-bv-address-verification')
+    @include('backend.pages.cases.partials.modify-bv-axis')
 @else
     @include('backend.pages.cases.partials.modify-bv-default')
 @endif

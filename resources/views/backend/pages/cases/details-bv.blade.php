@@ -62,17 +62,13 @@
                                 <tbody>
                                     <tr>
 
-                                        @if($case->getCase->bank_id != 12 && $case->getCase->bank_id != 13)
+                                        @if($case->getCase->bank_id != 12)
                                         <td style="width: 50%; border:none;font-size:22px;color:#0094ff; text-align:center" colspan="3">
-                                            <img alt="{{ $case->getCase->bank_id == 12 ? 'Synergee Risk Management Pvt. Ltd.' : ($case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD') }}" src="{{ $case->getCase->bank_id == 13 ? asset('images/sk-logo.png') : asset('images/logo.jpg') }}" style="max-height: 120px;">
-                                        </td>
-                                        @elseif($case->getCase->bank_id == 13)
-                                        <td style="width: 50%; border:none;font-size:22px;color:#0094ff; text-align:center" colspan="3">
-                                            <img alt="SK" src="{{ asset('images/sk-logo.png') }}" style="max-height: 120px;">
+                                            <img alt="{{ $case->getCase->bank_id == 12 ? 'Synergee Risk Management Pvt. Ltd.' : 'TIGER 4 INDIA LTD' }}" src="{{ asset('images/logo.jpg') }}">
                                         </td>
                                         @endif
                                         <td class="address_text align-middle text-white" style="width: 50%;background: #3fbaf7; text-align:center" colspan="{{ $case->getCase->bank_id == 12 ? 6 : 3 }}">
-                                            <h4>{{ $case->getCase->bank_id == 12 ? 'Synergee Risk Management Pvt. Ltd.' : ($case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD') }}</h4>
+                                            <h4>{{ $case->getCase->bank_id == 12 ? 'Synergee Risk Management Pvt. Ltd.' : 'TIGER 4 INDIA LTD' }}</h4>
                                         </td>
                                     </tr>
                                     <tr>
@@ -475,14 +471,14 @@
                                         <td colspan="3" style="text-align:center">
                                             <img title='image'
                                                 style='width:150px;margin-bottom:5px; margin-left:5px;border:2px solid #b06c1c;border-radius:10px;'
-                                                src="{{ $case->getCase->bank_id == 12 ? asset('images/synergeerisk-sign.jpeg') : ($case->getCase->bank_id == 13 ? asset('images/flexi-sign.jpeg') : asset('images/sign.png')) }}" />
+                                                src="{{ $case->getCase->bank_id == 12 ? asset('images/synergeerisk-sign.jpeg') : asset('images/sign.png') }}" />
                                             <br>
                                             Signature of Agency Supervisor (With agency Seal)
                                         </td>
                                         <td colspan="3" style="text-align:center">
                                             <img title='image'
                                                 style='width:150px;margin-bottom:5px; margin-left:5px;border:2px solid #b06c1c;border-radius:10px;'
-                                                src="{{ $case->getCase->bank_id == 12 ? asset('images/synergeerisk-sign.jpeg') : ($case->getCase->bank_id == 13 ? asset('images/flexi-sign.jpeg') : asset('images/sign.png')) }}" />
+                                                src="{{ $case->getCase->bank_id == 12 ? asset('images/synergeerisk-sign.jpeg') : asset('images/sign.png') }}" />
                                             <br>
                                             Audit Check Remarks by Agency With Stamp &amp; Sign
                                         </td>

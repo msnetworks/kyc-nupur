@@ -61,11 +61,11 @@
                                     <tbody>
                                         <tr>
                                             <td style="width: 30%; text-align:center; border:none;">
-                                                <img alt="{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }}" src="{{ $case->getCase->bank_id == 13 ? asset('images/sk-logo.png') : asset('images/logo.jpg') }}" style="max-height: 120px;">
+                                                <img alt="TIGER 4 INDIA LTD" src="{{ asset('images/logo.jpg') }}">
                                             </td>
                                             <td style="width: 70%; text-align:center; border:none;">
-                                            <strong>    <h1 style="color: #ff0000; "><u><i> {{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }} </i></u></h1>
-                                            {{ $case->getCase->bank_id == 13 ? 'No 752, Sainik Vihar, Saradhana Road, Kanker Khera, Meerut Uttar Pradesh - 250001' : 'VASANTKUNJNEW DELHI-110070' }}</strong>
+                                            <strong>    <h1 style="color: #ff0000; "><u><i> TIGER 4 INDIA LTD </i></u></h1>
+                                            VASANTKUNJNEW DELHI-110070</strong>
                                             </td>
                                         </tr>
                                         
@@ -161,7 +161,7 @@
                                         @endif
                                     </tbody>
                                 </table>
-                                <img src="{{ $case->getCase->bank_id == 13 ? asset('images/flexi-sign.jpeg') : asset('images/sign.png') }}" style="width:150px;margin-top:15px;">
+                                <img src="{{ asset('images/sign.png') }}" style="width:150px;margin-top:15px;">
                             </div>
                             <!-- Printable Content End -->
                         </div>

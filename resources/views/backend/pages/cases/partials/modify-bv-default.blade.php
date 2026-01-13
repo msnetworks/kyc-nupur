@@ -10,16 +10,10 @@
         <table class="table table-bordered">
             <tbody>
                 <tr>
-                    @if($case->getCase->bank_id != 12 && $case->getCase->bank_id != 13)
                     <td style="border:none;font-size:22px;color:#0094ff" class="text-center" colspan="2">
-                        <img alt="TIGER 4 INDIA LTD" src="{{ asset('images/logo.jpg') }}">
+                        <img alt="State Bank of India" src="{{ asset('images/logo.jpg') }}">
                     </td>
-                    @elseif($case->getCase->bank_id == 13)
-                    <td style="border:none;font-size:22px;color:#0094ff" class="text-center" colspan="2">
-                        <img alt="SK ENTERPRISES" src="{{ asset('images/sk-logo.png') }}">
-                    </td>
-                    @endif
-                    <td class="address_text align-middle text-white" style="background: #3fbaf7;" align="center" colspan="2"><h4> {{ $case->getCase->bank_id == 12 ? 'Synergee Risk Management Pvt. Ltd.' : ($case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD') }} </h4></td>
+                    <td class="address_text align-middle text-white" style="background: #3fbaf7;" align="center" colspan="2"><h4> TIGER 4 INDIA LTD </h4></td>
                 </tr>
                 <tr>
                     <td class="w-25">Reference No.</td>

@@ -67,14 +67,14 @@
                                     <tr style="border: 2px solid #000;">
                                         <td
                                             style="width: 30%; text-align: center; vertical-align: middle; border: 2px solid #000;">
-                                            <img alt="{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }}" src="{{ $case->getCase->bank_id == 13 ? asset('images/sk-logo.png') : asset('images/logo.jpg') }}" style="max-height: 120px;"
+                                            <img alt="TIGER 4 INDIA LTD" src="{{ asset('images/logo.jpg') }}"
                                                 style="max-width: 100%; height: auto;">
                                         </td>
                                         <td
                                             style="width: 70%; text-align: center; vertical-align: middle; border: 2px solid #000;">
                                             <strong>
-                                                <h1 style="color: #ff0000; margin: 0;"><u><i>{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }}</i></u></h1>
-                                                {{ $case->getCase->bank_id == 13 ? 'No 752, Sainik Vihar, Saradhana Road, Kanker Khera, Meerut Uttar Pradesh - 250001' : 'VASANT KUNJ, NEW DELHI-110070' }} <br>
+                                                <h1 style="color: #ff0000; margin: 0;"><u><i>TIGER 4 INDIA LTD</i></u></h1>
+                                                VASANT KUNJ, NEW DELHI-110070 <br>
                                             </strong>
                                         </td>
                                     </tr>
@@ -188,7 +188,7 @@
                                     <!-- Signature Section -->
                                     <tr style="border: 0px;">
                                         <td colspan="2" style="text-align: left; border: 0px;">
-                                            <img src="{{ $case->getCase->bank_id == 13 ? asset('images/flexi-sign.jpeg') : $sign }}" style="width: 150px; margin-top: 15px;">
+                                            <img src="{{ $sign }}" style="width: 150px; margin-top: 15px;">
                                         </td>
                                     </tr>
                                 </tbody>
