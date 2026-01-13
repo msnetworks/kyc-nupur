@@ -1,0 +1,36 @@
+.pagination-container nav {
+    display: flex;
+    flex-wrap: wrap; /* Allows wrapping to the next line */
+    justify-content: center;
+    gap: 5px;
+}
+
+.pagination-container nav a,
+.pagination-container nav span {
+    padding: 10px 15px;
+    margin: 2px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #333;
+}
+
+.pagination-container nav a:hover {
+    background-color: #e0e0e0;
+}
+
+.pagination-container nav span {
+    pointer-events: none;
+    background-color: #d0d0d0;
+    color: #999;
+}
+
+/* For small screens */
+@media (max-width: 768px) {
+    .pagination-container nav {
+        flex-wrap: nowrap; /* Prevent wrapping */
+        overflow-x: auto; /* Enable horizontal scrolling */
+        justify-content: flex-start; /* Align to the left */
+    }
+}
