@@ -41,6 +41,10 @@ class DashboardController extends Controller
         if (Auth::guard('admin')->user()->role === 'Bank') {
             return redirect()->route('admin.case.caseStatus', ['status' => 'aaa','user_id' => 0]);
         }
+        // dd(Auth::guard('admin')->user());
+        if (Auth::guard('admin')->user()->role === 'Observer') {
+            return redirect()->route('admin.case.observer');
+        }
 
         if ($request->FromDate) {
             $FromDate = $request->FromDate;

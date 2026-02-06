@@ -31,6 +31,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::group(['prefix' => 'admin'], function () {
     Route::get('/', 'Backend\DashboardController@index')->name('admin.dashboard');
     Route::post('/filter', 'Backend\DashboardController@filter')->name('admin.filter');
+    Route::get('cases/observer', 'Backend\CasesController@observer')->name('admin.case.observer');
     Route::resource('cases', 'Backend\CasesController', ['names' => 'admin.case']);
 
     // Route::get('cases/create', 'Backend\CasesController@create')->name('admin.case.create');
@@ -45,7 +46,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('cases/import', 'Backend\CasesController@import')->name('admin.case.import');
     Route::get('cases/reinitatiate-case/{id}', 'Backend\CasesController@reinitatiateCaseNew')->name('admin.case.reinitatiateCaseNew');
     Route::post('cases/reinitatiate-case/store', 'Backend\CasesController@reinitatiateNew')->name('admin.case.reinitatiate.store');
-    Route::get('cases/upload-image/{id}', 'Backend\CasesController@uploadCaseImage')->name('admin.case.upload.image');
+    Route::get('cases/upload-image/{id}', 'Backend\CasesController@uploadCaseImage')->name('admin.case.upload.casesimage');
     Route::post('cases/upload-image/{id}', 'Backend\CasesController@uploadImage')->name('admin.case.upload.image');
     Route::post('cases/delete-image/{id}', 'Backend\CasesController@deleteImage')->name('admin.case.delete.image');
     Route::get('cases/original-image/{id}', 'Backend\CasesController@originalCaseImage')->name('admin.case.original.image');
@@ -59,8 +60,10 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('cases/hold/{id}', 'Backend\CasesController@holdCase')->name('admin.case.hold');
     Route::get('cases/delete/{id}', 'Backend\CasesController@deleteCase')->name('admin.case.delete');
     Route::get('cases/case-status/{status}/{user_id?}', 'Backend\CasesController@caseStatus')->name('admin.case.caseStatus');
+    Route::get('cases/observer', 'Backend\CasesController@observer')->name('admin.case.observer');
+    Route::post('cases/observer/bulk-download', 'Backend\CasesController@observerBulkDownload')->name('admin.case.observer.bulk.download');
     Route::get('cases/dedup-case/{case_id?}', 'Backend\CasesController@dedupCase')->name('admin.case.dedup-case');
-    Route::get('cases/view/{id}', 'Backend\CasesController@viewCaseByCftId')->name('admin.case.viewCase');
+    Route::get('cases/view/{id}', 'Backend\CasesController@viewCaseByCftId')->name('admin.case.viewCaseByCftId');
     Route::get('cases/update/{id}', 'Backend\CasesController@viewCaseByCftId')->name('admin.case.updateCase');
     Route::get('cases/getdetail/{id}', 'Backend\CasesController@viewCase')->name('admin.case.viewCase');
     Route::get('cases/{id}/editCase', 'Backend\CasesController@editCase')->name('admin.case.editCase');
@@ -71,6 +74,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('cases/productUpdate/{id}', 'Backend\CasesController@updateproduct')->name('admin.case.product');
     Route::get('cases/branchcodeUpdate/{id}', 'Backend\CasesController@updatebranchcode')->name('admin.case.branchcode');
     Route::get('cases/geolimitUpdate/{id}', 'Backend\CasesController@updategeolimit')->name('admin.case.geolimit');
+    Route::post('cases/update-cpv-remarks', 'Backend\CasesController@updateCpvRemarks')->name('admin.case.updateCpvRemarks');
     
     Route::get('cases/view-form-edit/{id}', 'Backend\CasesController@modifyForm')->name('admin.case.viewForm.modify');
     // Route::post('cases/update-view-form-case/{id}', 'Backend\CasesController@modifyRVCase')->name('admin.case.modifyCase.viewCase');
@@ -132,6 +136,6 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/logout/submit', 'Backend\Auth\LoginController@logout')->name('admin.logout.submit');
 
     // Forget Password Routes
-    Route::get('/password/reset', 'Backend\Auth\ForgetPasswordController@showLinkRequestForm')->name('admin.password.request');
-    Route::post('/password/reset/submit', 'Backend\Auth\ForgetPasswordController@reset')->name('admin.password.update');
+    // Route::get('/password/reset', 'Backend\Auth\ForgetPasswordController@showLinkRequestForm')->name('admin.password.request');
+    // Route::post('/password/reset/submit', 'Backend\Auth\ForgetPasswordController@reset')->name('admin.password.update');
 });
