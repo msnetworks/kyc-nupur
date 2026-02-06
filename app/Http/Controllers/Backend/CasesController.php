@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use App\Jobs\ImportCasesJob;
+use Exception;
  
 class CasesController extends Controller
 {
@@ -55,9 +56,11 @@ class CasesController extends Controller
 
         // Check if the logged-in admin is a "Bank" role
         if (Auth::guard('admin')->check() && in_array(Auth::guard('admin')->user()->role, ['Bank', 'Admin', 'Manager'])) {
-            $cases = Cases::where("created_by", Auth::guard('admin')->user()->id)->get();
+            // Paginate cases created by this admin - 25 per page
+            $cases = Cases::where("created_by", Auth::guard('admin')->user()->id)->paginate(25);
         } else {
-            $cases = Cases::all();
+            // Paginate all cases - 25 per page
+            $cases = Cases::paginate(50);
         }
 
         // Fetch all banks (products)
@@ -91,7 +94,7 @@ class CasesController extends Controller
         $session_id         = Auth::guard('admin')->user()->id;
         $users              = User::where('admin_id', $session_id)->get();
 
-
+ 
         $fitypesFeild = '';
         $AgentsFeild = '';
         foreach ($fitypes as $key => $fitype) {
@@ -244,13 +247,13 @@ class CasesController extends Controller
         CaseHistoryHelper::logHistory($cases_id, null, null, null, 'New Case', 'Case Create', 'New Case Created');
 
         session()->flash('success', 'Case has been created !!');
-        return redirect()->route('admin.case.index');
+        return redirect()->back();
         
         }
         else{
             session()->flash('error', 'Please Select Case has been created !!');
-        return redirect()->route('admin.case.index');
-        }
+        return redirect()->back();
+        } 
     }
 
     /**
@@ -335,7 +338,7 @@ class CasesController extends Controller
             $fitypesFeild .= '</div>';
         }
 
-        LogHelper::logActivity('Show Case', 'User show case.');
+        // LogHelper::logActivity('Show Case', 'User show case.');
 
         return view('backend.pages.cases.show', compact('cases', 'banks', 'roles', 'fitypes', 'fitypesFeild', 'ApplicationTypes', 'fi_type_ids', 'AvailbleProduct'));
     }
@@ -1105,6 +1108,8 @@ class CasesController extends Controller
                 $img = Image::make(public_path($filePath));
                 $img->resize(1500, 2000);
 
+                // Old overlay/table approach (kept commented per request)
+                /*
                 // Table properties
                 $tableStartX = 50;
                 $tableStartY = $img->height() - 500;
@@ -1114,6 +1119,56 @@ class CasesController extends Controller
 
                 // Draw table and add text
                 $this->addTextToImage($img, $tableStartX, $tableStartY, $rowHeight, $tableWidth, $latitude, $longitude, $latlong_address, $dateTime);
+                */
+
+                // New: add white background at bottom with padding and dynamic font sizing
+                $origWidth = $img->width();
+                $origHeight = $img->height();
+                $padding = 15; // left/top padding inside the extra area
+                $rightPadding = 40; // extra right padding specifically for the information area
+                // font size proportional to image width (1500px ~ 28px)
+                $fontSize = max(16, intval($origWidth / 54));
+                $fontPath = public_path('fonts/ARIAL.TTF');
+
+                // Prepare bottom text lines
+                $lines = [];
+                if (!empty(trim($latlong_address))) {
+                    $lines[] = 'Address: ' . trim($latlong_address);
+                }else {
+                    $lines[] = 'Address: N/A';
+                }
+                $lines[] = 'Latitude: ' . ($latitude ?? '');
+                $lines[] = 'Longitude: ' . ($longitude ?? '');
+                $lines[] = 'Date: ' . $dateTime;
+                $bottomText = implode("\n", $lines);
+
+                // Wrap the bottom text to the available width inside padding and extra right padding
+                $wrapWidth = $origWidth - ($padding + $rightPadding);
+                $wrappedBottom = $this->wrapText($img, $bottomText, $wrapWidth, $fontSize, $fontPath);
+
+                // Calculate required height for the wrapped text (approx using fontSize)
+                $linesCount = substr_count($wrappedBottom, "\n") + 1;
+                $lineHeight = intval($fontSize * 1.4);
+                $requiredAreaHeight = ($linesCount * $lineHeight) + ($padding * 2);
+                $extraHeight = max(100, $requiredAreaHeight);
+
+                $newHeight = $origHeight + $extraHeight;
+
+                // Create white canvas and insert original image at the top-left
+                $canvas = Image::canvas($origWidth, $newHeight, '#ffffff');
+                $canvas->insert($img, 'top-left', 0, 0);
+
+                // Write text into the white area (left aligned, top aligned within the extra area)
+                $canvas->text($wrappedBottom, $padding, $origHeight + $padding, function ($font) use ($fontPath, $fontSize) {
+                    $font->file($fontPath);
+                    $font->size($fontSize);
+                    $font->color('#000000');
+                    $font->align('left');
+                    $font->valign('top');
+                });
+
+                // Use new canvas as the final image
+                $img = $canvas;
 
                 $img->save(public_path($filePath));
 
@@ -1174,86 +1229,62 @@ class CasesController extends Controller
 
     private function addTextToImage($img, $tableStartX, $tableStartY, $rowHeight, $tableWidth, $latitude, $longitude, $latlong_address, $dateTime)
     {
-        $col1Width = $img->width() * 0.25; // 25% for the first column
-        $col2Width = $img->width() * 0.72; // 72% for the second column
-        $padding = $img->width() * 0.03; // 3% for the second column
-        $tableWidth = $col1Width + $col2Width - $padding;
-        $tableHeight = $rowHeight * 4;
+        $col1Width = $img->width() * 0.25;
+        $col2Width = $img->width() * 0.72;
+        $tableWidth = $col1Width + $col2Width;
 
-        // Draw background rectangle for the table
+        $fontPath = public_path('fonts/ARIAL.TTF');
+        $rows = [
+            ['label' => 'Address', 'value' => $this->wrapText($img, (string) $latlong_address, $col2Width - 40, 40, $fontPath)],
+            ['label' => 'Latitude', 'value' => (string) $latitude],
+            ['label' => 'Longitude', 'value' => (string) $longitude],
+            ['label' => 'Date', 'value' => (string) $dateTime],
+        ];
+
+        $rowCount = count($rows);
+        $tableHeight = $rowHeight * $rowCount;
+
+        $styleLabel = function ($font) use ($fontPath) {
+            $font->file($fontPath);
+            $font->size(40);
+            $font->color('#FFFFFF');
+            $font->align('left');
+            $font->valign('middle');
+        };
+
+        $styleValue = function ($font) use ($fontPath) {
+            $font->file($fontPath);
+            $font->size(40);
+            $font->color('#FFFFFF');
+            $font->align('left');
+            $font->valign('top');
+        };
+
         $img->rectangle(
             $tableStartX,
             $tableStartY,
             $tableStartX + $tableWidth,
             $tableStartY + $tableHeight,
             function ($draw) {
-                $draw->background([0, 0, 0, 0.5]); // Semi-transparent black
+                $draw->background([0, 0, 0, 0.5]);
             }
         );
-        // Add Latitude
-        $img->text('Address', $tableStartX + 10, $tableStartY + $rowHeight / 2, function ($font) {
-            $font->file(public_path('fonts/ARIAL.TTF'));
-            $font->size(40);
-            $font->color('#fff'); // White text color
-            $font->align('left');
-            $font->valign('middle');
-        });
 
-        $img->text($latlong_address, $tableStartX + $col1Width + 10, $tableStartY + $rowHeight / 2, function ($font) {
-            $font->file(public_path('fonts/ARIAL.TTF'));
-            $font->size(40);
-            $font->color('#fff'); // White text color
-            $font->align('left');
-            $font->valign('middle');
-        });
-        // Add Latitude
-        $img->text("Latitude", $tableStartX + 10, $tableStartY + $rowHeight + $rowHeight / 2, function ($font) {
-            $font->file(public_path('fonts/ARIAL.TTF'));
-            $font->size(40);
-            $font->color('#FFFFFF'); // White text color
-            $font->align('left');
-            $font->valign('middle');
-        });
-        $img->text($latitude, $tableStartX + $col1Width + 10, $tableStartY + $rowHeight + $rowHeight / 2, function ($font) {
-            $font->file(public_path('fonts/ARIAL.TTF'));
-            $font->size(40);
-            $font->color('#fff'); // White text color
-            $font->align('left');
-            $font->valign('middle');
-        });
+        foreach ($rows as $index => $row) {
+            $rowTop = $tableStartY + ($rowHeight * $index);
+            $labelY = $rowTop + ($rowHeight / 2);
+            $valueY = $rowTop + 20;
 
-        // Add Longitude
-        $img->text("Longitude", $tableStartX + 10, $tableStartY + $rowHeight + $rowHeight + $rowHeight / 2, function ($font) {
-            $font->file(public_path('fonts/ARIAL.TTF'));
-            $font->size(40);
-            $font->color('#fff'); // White text color
-            $font->align('left');
-            $font->valign('middle');
-        });
-        $img->text($longitude, $tableStartX + $col1Width + 10, $tableStartY + $rowHeight + $rowHeight + $rowHeight / 2, function ($font) {
-            $font->file(public_path('fonts/ARIAL.TTF'));
-            $font->size(40);
-            $font->color('#fff'); // White text color
-            $font->align('left');
-            $font->valign('middle');
-        });
+            $img->text($row['label'], $tableStartX + 10, $labelY, function ($font) use ($styleLabel) {
+                $styleLabel($font);
+            });
 
-        $img->text('Date', $tableStartX + 10, $tableStartY + $rowHeight + $rowHeight + $rowHeight  + $rowHeight / 2, function ($font) {
-            $font->file(public_path('fonts/ARIAL.TTF'));
-            $font->size(40);
-            $font->color('#fff'); // White text color
-            $font->align('left'); // Center align text
-            $font->valign('middle');
-        });
-        $img->text($dateTime, $tableStartX + $col1Width + 10, $tableStartY + $rowHeight + $rowHeight + $rowHeight  + $rowHeight / 2, function ($font) {
-            $font->file(public_path('fonts/ARIAL.TTF'));
-            $font->size(40);
-            $font->color('#fff'); // White text color
-            $font->align('left'); // Center align text
-            $font->valign('middle');
-        });
-        // Draw table borders
-        $this->drawTableBorders($img, $tableStartX, $tableStartY, $rowHeight, 4, $col1Width, $col2Width);
+            $img->text($row['value'], $tableStartX + $col1Width + 10, $valueY, function ($font) use ($styleValue) {
+                $styleValue($font);
+            });
+        }
+
+        $this->drawTableBorders($img, $tableStartX, $tableStartY, $rowHeight, $rowCount, $col1Width, $col2Width);
     }
 
     private function getAvailableImageField($case)
@@ -1570,6 +1601,140 @@ class CasesController extends Controller
         }
 
         return view('backend.pages.cases.caseList', compact('cases', 'assign', 'status', 'user_id', 'perPage', 'fitype', 'branchcode'));
+    }
+
+    public function observer(Request $request)
+    {
+        $user = Auth::guard('admin')->user();
+        $perPage = $request->get('perPage', 25);
+
+        $casequery = casesFiType::with([
+            'getUser',
+            'getCase',
+            'getCase.getCreatedBy',
+            'getCase.getBranch',
+            'getFiType',
+        ]);
+
+        $casequery->whereHas('getCase', function ($query) {
+            $query->where('bank_id', 10);
+        });
+
+        $casequery->whereIn('status', ['4', '5', '7']);
+
+        if ($user->role !== 'superadmin') {
+            if ($user->role === 'Bank') {
+                $casequery->whereHas('getCase', function ($query) use ($user) {
+                    $query->where('created_by', $user->id);
+                });
+            } else {
+                $assignedBanks = array_filter(explode(',', $user->banks_assign ?? ''));
+                if (!empty($assignedBanks)) {
+                    $casequery->whereHas('getCase', function ($query) use ($assignedBanks) {
+                        $query->whereIn('bank_id', $assignedBanks);
+                    });
+                }
+            }
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $casequery->where(function ($query) use ($search) {
+                $query->whereHas('getCase', function ($casequery) use ($search) {
+                    $casequery->where('refrence_number', 'LIKE', "%$search%")
+                        ->orWhere('applicant_name', 'LIKE', "%$search%")
+                        ->orWhere('co_applicant_name', 'LIKE', "%$search%");
+                })
+                ->orWhere('mobile', 'LIKE', "%$search%")
+                ->orWhere('city', 'LIKE', "%$search%")
+                ->orWhere('address', 'LIKE', "%$search%");
+            });
+        }
+
+        if ($request->filled('start_date')) {
+            try {
+                $startDate = Carbon::parse($request->start_date)->toDateString();
+                $casequery->whereDate('created_at', '>=', $startDate);
+            } catch (Exception $e) {
+                // ignore invalid date
+            }
+        }
+
+        if ($request->filled('end_date')) {
+            try {
+                $endDate = Carbon::parse($request->end_date)->toDateString();
+                $casequery->whereDate('created_at', '<=', $endDate);
+            } catch (Exception $e) {
+                // ignore invalid date
+            }
+        }
+
+        $cases = $casequery->orderByDesc('created_at')->paginate($perPage);
+
+        if ($request->ajax()) {
+            return view('backend.pages.cases.observerCaseTable', compact('cases'))->render();
+        }
+
+        return view('backend.pages.cases.observer', compact('cases', 'perPage'));
+    }
+
+    public function observerBulkDownload(Request $request)
+    {
+        $caseIds = json_decode($request->input('case_ids'), true);
+
+        if (!is_array($caseIds) || empty($caseIds)) {
+            return response()->json(['error' => 'No cases selected'], 400);
+        }
+
+        $cases = casesFiType::whereIn('id', $caseIds)->get();
+
+        if ($cases->isEmpty()) {
+            return response()->json(['error' => 'No cases found'], 404);
+        }
+
+        $zipFileName = 'observer_cases_' . date('Y_m_d_His') . '.zip';
+        $zipPath = storage_path('app/public/' . $zipFileName);
+        $zip = new ZipArchive();
+
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            return response()->json(['error' => 'Unable to create zip file'], 500);
+        }
+
+        foreach ($cases as $case) {
+            try {
+                $pdfContent = $this->generatePdfContent($case);
+                $fileName = 'Case_' . ($case->getCase->refrence_number ?? $case->id) . '.pdf';
+                $zip->addFromString($fileName, $pdfContent);
+            } catch (Exception $e) {
+                // Skip cases with PDF generation errors
+                continue;
+            }
+        }
+
+        $zip->close();
+
+        return response()->download($zipPath)->deleteFileAfterSend(true);
+    }
+
+    private function generatePdfContent($caseFiType)
+    {
+        $pdf = new Dompdf();
+        
+        $html = '<html><head><meta charset="UTF-8"></head><body>';
+        $html .= '<h2>Case Details</h2>';
+        $html .= '<p><strong>Reference Number:</strong> ' . ($caseFiType->getCase->refrence_number ?? 'N/A') . '</p>';
+        $html .= '<p><strong>Applicant Name:</strong> ' . ($caseFiType->getCase->applicant_name ?? 'N/A') . '</p>';
+        $html .= '<p><strong>Branch:</strong> ' . (optional($caseFiType->getCase->getBranch)->branch_code ?? 'N/A') . '</p>';
+        $html .= '<p><strong>Address:</strong> ' . ($caseFiType->address ?? 'N/A') . '</p>';
+        $html .= '<p><strong>City:</strong> ' . ($caseFiType->city ?? 'N/A') . '</p>';
+        $html .= '<p><strong>FI Type:</strong> ' . ($caseFiType->getFiType->name ?? 'N/A') . '</p>';
+        $html .= '<p><strong>Status:</strong> ' . get_status($caseFiType->status) . '</p>';
+        $html .= '</body></html>';
+
+        $pdf->loadHtml($html);
+        $pdf->render();
+
+        return $pdf->output();
     }
 
 
@@ -2168,6 +2333,9 @@ class CasesController extends Controller
         if (array_key_exists('applicant_name', $input)) {
             $case->applicant_name = $input['applicant_name'];
         }
+        if (array_key_exists('amount', $input)) {
+            $case->amount = $input['amount'];
+        }
         $case->save();
 
         if ($case->bank_id == 12) {
@@ -2202,6 +2370,9 @@ class CasesController extends Controller
             $caseFi->residence_profile           = $input['residence_profile'] ?? $caseFi->residence_profile;
             $caseFi->verification_status         = $input['verification_status'] ?? $caseFi->verification_status;
             $caseFi->authorized_signatory        = $input['authorized_signatory'] ?? $caseFi->authorized_signatory;
+            $caseFi->latitude                    = $input['latitude'] ?? $caseFi->latitude;
+            $caseFi->longitude                   = $input['longitude'] ?? $caseFi->longitude;
+            $caseFi->latlong_address             = $input['latlong_address'] ?? $caseFi->latlong_address;
         } else {
             $caseFi->dealer_code                    = $input['dealer_code'] ?? null;
             $caseFi->landline                       = $input['landline'] ?? null;
@@ -2534,5 +2705,28 @@ class CasesController extends Controller
         Mail::to('susheelcs0024@gmail.com')->send(new SendMail($details));
         session()->flash('success', 'Email sent successfully !!');
         return redirect()->back();
+    }
+
+    public function updateCpvRemarks(Request $request)
+    {
+        try {
+            $caseId = $request->input('case_id');
+            $appRemarks = $request->input('app_remarks', true);
+            // Validate inputs
+            if (!$caseId || !$appRemarks) {
+                return response()->json(['success' => false, 'message' => 'Case ID and remarks are required.']);
+            }
+
+            // Find and update the case
+            $case = CasesFiType::findOrFail($caseId);
+            $case->app_remarks = $appRemarks;
+            $case->save();
+
+            LogHelper::logActivity('Update CPV Remarks', 'User updated CPV remarks for case ID: ' . $caseId);
+
+            return response()->json(['success' => true, 'message' => 'Comments updated successfully.']);
+        } catch (Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error updating remarks: ' . $e->getMessage()]);
+        }
     }
 }

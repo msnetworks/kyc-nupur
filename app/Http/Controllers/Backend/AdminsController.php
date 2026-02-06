@@ -170,11 +170,12 @@ class AdminsController extends Controller
         $admin->name = $request->name;
         $admin->email = $request->email;
         $admin->mobile = $request->mobile;
-        
+        $admin->role = implode(', ', $request->roles);
 
         $admin->banks_assign = $bank;
         $admin->branch_assign = $request->branch_assign ?? null;
         $admin->username = $request->username;
+        
         if ($request->password) {
             if(Auth::guard('admin')->user()->role == 'superadmin'){
                 $admin->view_password = $request->password;
