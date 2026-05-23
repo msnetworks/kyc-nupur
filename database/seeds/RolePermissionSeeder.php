@@ -107,6 +107,16 @@ class RolePermissionSeeder extends Seeder
                 ]
             ],
             [
+                'group_name' => 'upload_card',
+                'permissions' => [
+                    'upload_card.dashboard',
+                    'upload_card.create',
+                    'upload_card.view',
+                    'upload_card.edit',
+                    'upload_card.delete',
+                ]
+            ],
+            [
                 'group_name' => 'user',
                 'permissions' => [
                     // admin Permissions

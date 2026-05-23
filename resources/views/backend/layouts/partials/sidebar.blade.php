@@ -86,6 +86,28 @@
                          </ul>
                      </li>
                      @endif
+
+                     @if ($usr->can('upload_card.dashboard') || $usr->can('upload_card.create') || $usr->can('upload_card.view') || $usr->can('upload_card.edit') || $usr->can('upload_card.delete'))
+                     <li>
+                         <a href="javascript:void(0)" aria-expanded="true"><i class="fa fa-upload"></i><span>
+                                 Upload Card
+                             </span></a>
+                         <ul class="collapse {{ Route::is('admin.upload-cards.create') || Route::is('admin.upload-cards.index') || Route::is('admin.upload-cards.edit') || Route::is('admin.upload-cards.show') || Route::is('admin.upload-cards.dashboard') ? 'in' : '' }}">
+                             @if ($usr->can('upload_card.dashboard'))
+                             <li class="{{ Route::is('admin.upload-cards.dashboard') ? 'active' : '' }}"><a href="{{ route('admin.upload-cards.dashboard') }}">Upload Card Dashboard</a></li>
+                             @endif
+                             @if ($usr->can('upload_card.view'))
+                             <li class="{{ Route::is('admin.upload-cards.index')  || Route::is('admin.upload-cards.edit') ? 'active' : '' }}"><a href="{{ route('admin.upload-cards.index') }}">All Upload Cards</a></li>
+                             @endif
+
+                             @if ($usr->can('upload_card.create'))
+                             <li class="{{ Route::is('admin.upload-cards.create')  ? 'active' : '' }}"><a href="{{ route('admin.upload-cards.create') }}">Create Upload Card</a></li>
+                             @endif
+                         </ul>
+                     </li>
+                     @endif
+
+
                      @if ($usr->can('report.create') || $usr->can('report.view') || $usr->can('report.edit') || $usr->can('report.delete'))
                      <li>
                          <a href="javascript:void(0)" aria-expanded="true"><i class="fa fa-tasks"></i><span>
@@ -102,6 +124,7 @@
                          </ul>
                      </li>
                      @endif
+
                      <!-- <li style="color: #ffffff;">--------------------------------------------------</li> -->
                      @if ($usr->can('fitype.create') || $usr->can('fitype.view') || $usr->can('fitype.edit') || $usr->can('fitype.delete'))
                      <li>
@@ -182,6 +205,8 @@
                          </ul>
                      </li>
                      @endif
+
+
 
 
                      @if ($usr->can('admin.create') || $usr->can('admin.view') || $usr->can('admin.edit') || $usr->can('admin.delete'))

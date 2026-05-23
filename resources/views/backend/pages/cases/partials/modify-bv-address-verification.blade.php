@@ -17,11 +17,28 @@
         <table class="table table-bordered">
             <tbody>
                 
-                <tr>
+                {{-- <tr>
                     <td style="border:none;font-size:22px;color:#0094ff" class="text-center" colspan="2">
-                        <img alt="{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'Synergee Risk Pvt Ltd.' }}" style="width: 150px; max-height: 120px;" src="{{ $case->getCase->bank_id == 13 ? asset('images/sk-logo.png') : asset('logos/synergeerisk-logo.png') }}">
+                        <img alt="{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'T' }}" style="width: 150px; max-height: 120px;" src="{{ $case->getCase->bank_id == 13 ? asset('images/sk-logo.png') : asset('logos/synergeerisk-logo.png') }}">
                     </td>
                     <td class="address_text align-middle text-white" style="background: #3fbaf7;" align="center" colspan="2"><h4 class="text-white">{{ $case->getCase->bank_id == 13 ? 'SK ENTERPRISES' : 'Synergee Risk Pvt Ltd.' }}</h4></td>
+                
+                </tr> --}}
+                <tr>
+                    <td style="width: 50%; border:none;font-size:22px;color:#0094ff; text-align:center"
+                        colspan="2">
+                        <img alt="{{ $case->getCase->bank_id == 12 ? 'S K Enterprises' : 'TIGER 4 INDIA LTD' }}" 
+                        style="width: 150px; max-height: 80px;"
+                            src="{{ $case->getCase->bank_id == 12 || $case->getCase->bank_id == 13 ? asset('images/sk-logo.png') : asset('images/logo.jpg') }}">
+                    </td>
+                    <td class="address_text align-middle text-white"
+                        style="width: 50%;background: #3fbaf7; text-align:center;" colspan="2">
+                        <h4 class="text-white">{{ $case->getCase->bank_id == 12 ? 'S K Enterprises' : 'TIGER 4 INDIA LTD' }}
+                            <br><small style="font-size: 11px;">{{ $case->getCase->bank_id == 13 || $case->getCase->bank_id == 12 ? 'No 752, Sainik Vihar, Saradhana Road, Kanker Khera, Meerut Uttar Pradesh - 250001' : 'VASANT KUNJ NEW DELHI-110070' }}</small>
+                    </td>
+                </tr>
+                        </h4>
+                    </td>
                 </tr>
                 <tr>
                     <td>FCU Agency Name</td>

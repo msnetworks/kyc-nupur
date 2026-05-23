@@ -5,12 +5,13 @@
             <th style="padding: 5px;">App Id</th>
             <th style="padding: 5px;">Internal Code</th>
             <th style="padding: 5px;">Branch Code</th>
+            <th style="padding: 5px;">Dealer Code</th>
             <th style="padding: 5px;">Name</th>
             <th style="padding: 5px;">Mobile Number</th>
             <th style="padding: 5px;">Address</th>
             <th style="padding: 5px;">City</th>
             <th style="padding: 5px;">FIType</th>
-            <th style="padding: 5px;">Tat Start & End</th>
+            <th style="padding: 5px;">Created At</th>
             @if(auth()->check())
                     @if(auth()->user()->role != 'Bank')
             <th style="padding: 5px;">Agent</th>
@@ -31,6 +32,7 @@
             <td>{{ ($cases->currentPage() - 1) * $cases->perPage() + $loop->iteration }}</td>
             <td>{{ $case->getCase->refrence_number ?? '' }}</td>
             <td>{{ isset($case->getCase->getBranch) ? optional($case->getCase->getBranch)->branch_code. "( ". optional($case->getCase->getBranch)->branch_name . ")" : '' }}</td>
+            <td>{{ isset($case->dealer_code) ? $case->dealer_code : '' }}</td>
             <td>{{ $case->getCase->applicant_name ?? $case->applicant_name }}</td>
             <td>{{ $case->mobile ?? '' }}</td>
             <td style="width: 15%">{{ $case->address ?? '' }}&nbsp;&nbsp;
@@ -68,7 +70,7 @@
             }
             @endphp
             <td>{{ $columnValue }}</td>
-            <td>{{ isset($case->tat_start) ? 'Start: '. humanReadableDate($case->tat_start) . ' End : '.humanReadableDate($case->tat_end) :'' }}</td>
+            <td>{{ isset($case->created_at) ?  humanReadableDate($case->created_at) :'' }}</td>
             @if(auth()->check())
                     @if(auth()->user()->role != 'Bank')
             <td>{{ $case->getUser->name ?? '' }}</td>
@@ -104,8 +106,8 @@
                             <a href="javascript:;" data-row="{{ $case->id }}" class="caseClose"><img src="{{URL::asset('backend/assets/images/icons/Close.gif')}}" title="Case close"></img></a>
                         @endif
                         @endif
-                       @if(in_array($case->fi_type_id , [7,8, 14]))
-                       <a href="{{ route('admin.case.viewForm',$case->id)}}" target="_blank" class="view Form" data-row="{{ $case->id }}"><img src="{{URL::asset('backend/assets/images/icons/verified_cases.png')}}" title="View Form"></img></a>
+                       @if(in_array($case->fi_type_id , [7,8, 14]) && auth()->user()->role != 'Bank' && $case->getCase->bank_id != 12)
+                        <a href="{{ route('admin.case.viewForm',$case->id)}}" target="_blank" class="viewForm" data-row="{{ $case->id }}"><img src="{{URL::asset('backend/assets/images/icons/verified_cases.png')}}" title="View Form"></img></a>
                        @endif
                     @if(auth()->user()->role != 'Bank')
                         <a href="javascript:;" data-row="{{ $case->id }}" class="cloneCase"><img src="{{URL::asset('backend/assets/images/icons/add.png')}}" title="clone case"></img></a>
@@ -135,6 +137,8 @@
                 @if(auth()->user()->role == 'superadmin')
                     <a href="javascript:;" data-row="{{ $case->getCase->id }}" data-ref_no="{{ $case->getCase->refrence_number ?? '' }}" data-app_name="{{ $case->getCase->applicant_name ?? $case->applicant_name }}" data-geo_limit="{{ $case->getCase->geo_limit ?? '' }}" class="geoLimitModel" data-target="geoLimitModel"><img src="{{URL::asset('backend/assets/images/icons/edit.png')}}" title="Update Geo Limit"></img></a>
                 @endif
+                <a href="javascript:;" data-row="{{ $case->id }}" class="cpvRemarks"><img src="{{URL::asset('backend/assets/images/icons/page_white_text_width.png')}}" title="CPV Comments"></img></a>
+
             </td>
         </tr>
         @endforeach

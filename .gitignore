@@ -1,4 +1,7 @@
+vendor/
 storage/
 .vscode/sftp.json
 storage/logs/laravel.log
 public/images
+.env
+.env.*

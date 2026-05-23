@@ -57,6 +57,12 @@ class LoginController extends Controller
 
         // Attempt to login
         if (Auth::guard('admin')->attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
+            // Check if user is blocked
+            if (Auth::guard('admin')->user()->is_blocked) {
+                Auth::guard('admin')->logout();
+                session()->flash('error', 'Your account has been blocked. Please contact the administrator.');
+                return back();
+            }
             // Redirect to dashboard
             session()->flash('success', 'Successully Logged in !');
             // Check user role and redirect
@@ -67,6 +73,12 @@ class LoginController extends Controller
         } else {
             // Search using username
             if (Auth::guard('admin')->attempt(['username' => $request->email, 'password' => $request->password], $request->remember)) {
+                // Check if user is blocked
+                if (Auth::guard('admin')->user()->is_blocked) {
+                    Auth::guard('admin')->logout();
+                    session()->flash('error', 'Your account has been blocked. Please contact the administrator.');
+                    return back();
+                }
                 session()->flash('success', 'Successully Logged in !');
                 // Check user role and redirect
                 if (Auth::guard('admin')->user()->role === 'Bank') {

@@ -151,15 +151,13 @@
     <table class="table table-bordered" style="width: 100%" border="2">
         <tbody>
             <tr>
-                @if($case->getCase->bank_id != 12)
                 <td style="border:none; font-size:22px; color:#000;" align="center">
-                    <img style="width: 180px;" alt="TIGER 4 INDIA LTD" src="{{ $logo }}">
+                    <img style="height: 80px;" alt="TIGER 4 INDIA LTD" src="{{ $logo }}">
                 </td>
-                @endif
-                <td class="address_text" align="center" calspan="{{ $case->getCase->bank_id == 12 ? 2 : 1 }}">
+                <td class="address_text" align="center">
                     <h2 style="color: #ff0000; margin-bottom: 0;"><u>
-                        <i>{{ $case->getCase->bank_id == 12 ? 'Synergee Risk Management Pvt. Ltd.' : 'TIGER 4 INDIA LTD' }}</i></u></h2>
-                        <small>VASANT KUNJ NEW DELHI-110070</small>
+                        <i>{{ $case->getCase->bank_id == 13 || $case->getCase->bank_id == 12 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }}</i></u></h2>
+                        <small>{{ $case->getCase->bank_id == 13 || $case->getCase->bank_id == 12 ? 'No 752, Sainik Vihar, Saradhana Road, Kanker Khera, Meerut Uttar Pradesh - 250001' : 'VASANT KUNJ NEW DELHI-110070' }}</small>
                 </td>
             </tr>
             
@@ -223,10 +221,10 @@
                 <td>{{ $case->getCase->amount ?? 'NA' }}</td>
             </tr>
             <tr>
+                <td class="head-text">App ID</td>
+                <td >{{ $case->dealer_code ?? 'NA' }}</td>
                 <td class="head-text">Contact No.</td>
                 <td>{{ $case->mobile ?? '' }}</td>
-                <td></td>
-                <td></td>
             </tr>
             <tr>
                 <td class="head-text">Address</td>
@@ -243,7 +241,7 @@
             <tr>
                 <td class="head-text">Address Confirmed </td>
                 <td>
-                    {{ (in_array($case->address_confirmed, ['Self/Colleague', 'Receptionist/Guard']) ? 'Yes' : 'NO') ?? '' }}
+                    {{ $case->address_confirmed ?? 'N/A' }}
                     &nbsp;
                 </td>
             </tr>
@@ -266,13 +264,13 @@
             </tr>
             <tr>
                 <td class="head-text">Name of Employer/Co</td>
-                <td>{{ $case->name_of_employer ?? 'NA' }} </td>
+                <td>{{ $case->name_of_employer_co ?? 'NA' }} </td>
                 <td class="head-text">Person Met</td>
                 <td>{{ $case->person_met ?? 'NA' }} </td>
             </tr>
             <tr>
                 <td class="head-text">Address of Employer/Co</td>
-                <td colspan="3" >{{ $case->address ?? 'NA' }}</td>
+                <td colspan="3" >{{ $case->employer_address ?? 'NA' }}</td>
             </tr>
             <tr>
                 <td class="head-text">Website of Employer/Co(if available)</td>
@@ -282,7 +280,7 @@
             </tr>
             <tr>
                 <td class="head-text">Mobile Number</td>
-                <td class="BVstyle" ng-hide="BVResponse.mobileno">{{ $case->mobile ?? 'NA' }}</td>
+                <td class="BVstyle" ng-hide="BVResponse.mobileno">{{ $case->employer_mobile ?? 'NA' }}</td>
                 <td></td>
                 <td></td>
             </tr>
@@ -290,7 +288,7 @@
                 <td class="head-text">Co. Board Outside Bldg/Office</td>
                 <td>{{ $case->co_board_outside_bldg_office ?? 'NA' }}</td>
                 <td class="head-text">Type of Employer/Co</td>
-                <td>{{ $case->email_of_employer ?? 'NA' }}</td>
+                <td>{{ $case->type_of_employer ?? 'NA' }}</td>
             </tr>
             <tr>
                 <td class="head-text">Nature of Business</td>
@@ -312,7 +310,7 @@
                 <td class="head-text">No of Branches/Offices</td>
                 <td>{{ $case->no_of_branches ?? 'NA' }} </td>
                 <td class="head-text">Office ambience/look</td>
-                <td>{{ $case->assets_seen ?? 'NA' }}</td>
+                <td>{{ $case->interior_conditions ?? 'NA' }}</td>
             </tr>
             <tr>
                 <td class="head-text">Type of Locality </td>
@@ -324,7 +322,7 @@
                 <td class="head-text">Nearest Landmark</td>
                 <td>{{ $case->nearest_landmark ?? 'NA' }} </td>
                 <td class="head-text">Ease of Locating</td>
-                <td>{{ $case->email_of_employer ?? '0000' }}</td>
+                <td>{{ $case->ease_of_locating ?? '0000' }}</td>
             </tr>
             <tr>
                 <td class="head-text">Terms of employment(for employees)</td>

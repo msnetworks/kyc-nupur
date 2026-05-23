@@ -272,6 +272,20 @@ Create Case Create - Admin Panel
                         
                         <div class="form-row">
                             <div class="form-group col-md-6 col-sm-12">
+                                <label for="assigned_user">Assigned User</label>
+                                <!-- Debug: Total assigned users = {{ count($assignedUsers) }} -->
+                                <select name="assigned_user_id" id="assignedUserSelect" class="custom-select">
+                                    <option value="">--Select Option--</option>
+                                    @if($assignedUsers && count($assignedUsers) > 0)
+                                        @foreach($assignedUsers as $user)
+                                            <option value="{{ $user->id }}">{{ $user->name }} ({{ $user->email }})</option>
+                                        @endforeach
+                                    @else
+                                        <option value="" disabled>No assigned users available</option>
+                                    @endif
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6 col-sm-12">
                                 <label for="name">Remarks</label>
                                 <textarea name="remarks" rows="2" cols="20" id="remarks" class="form-control" placeholder="Remarks"></textarea>
                             </div>

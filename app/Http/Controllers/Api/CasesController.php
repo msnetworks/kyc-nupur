@@ -508,7 +508,7 @@ class CasesController extends Controller
     }
     private function getAvailableImageField($case)
     {
-        for ($i = 1; $i <= 9; $i++) {
+        for ($i = 1; $i <= 12; $i++) {
             $imgField = 'image_' . $i;
             if (is_null($case->$imgField)) {
                 return $imgField;
@@ -539,7 +539,7 @@ class CasesController extends Controller
 
         // Count how many images are present in the database for this case
         $imageCount = 0;
-        for ($i = 1; $i <= 9; $i++) {
+        for ($i = 1; $i <= 12; $i++) {
             $imageField = 'image_' . $i;
             if (isset($cases->$imageField) && !empty($cases->$imageField)) {
                 $imageCount++;
