@@ -32,7 +32,8 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="actionDropdown{{ $case->id }}">
                         <li><a class="dropdown-item" style="border-bottom: 1px solid #e3e6f0; padding: 12px 16px;" href="{{ route('admin.case.export.pdf', $case->id) }}" target="_blank" rel="noopener">Download PDF</a></li>
-                        <li><a class="dropdown-item observerCpvRemarks" style="border-bottom: 1px solid #e3e6f0; padding: 12px 16px;" href="javascript:;" data-row="{{ $case->id }}">CPV Comment</a></li>
+                        {{-- <li><a class="dropdown-item observerCpvRemarks" style="border-bottom: 1px solid #e3e6f0; padding: 12px 16px;" href="javascript:;" data-row="{{ $case->id }}">CPV Comment</a></li> --}}
+                        <li><a href="javascript:;" data-row="{{ $case->id }}" class="dropdown-item cpvRemarks" style="border-bottom: 1px solid #e3e6f0; padding: 12px 16px;" href="javascript:;" data-row="{{ $case->id }}">Update CPV Comment</a></li>
                         <li><a class="dropdown-item" style="padding: 12px 16px;" href="{{ route('admin.case.upload.image', $case->id) }}">Upload Image</a></li>
                     </ul>
                 </div>

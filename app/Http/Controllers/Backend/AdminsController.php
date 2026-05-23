@@ -7,6 +7,7 @@ use App\Models\Admin;
 use App\Models\Bank;
 use App\Models\BranchCode;
 use App\Exports\AdminsExport;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -39,8 +40,8 @@ class AdminsController extends Controller
         }
 
         $admins = Admin::all();
-
-        return view('backend.pages.admins.index', compact('admins'));
+        $users = User::all();
+        return view('backend.pages.admins.index', compact('admins', 'users'));
     }
 
     /**
@@ -100,6 +101,7 @@ class AdminsController extends Controller
         $admin->parent_id   = Auth::guard('admin')->user()->id;
         $admin->password    = Hash::make($request->password);
         $admin->view_password = $request->password;
+        $admin->is_blocked    = 0;
         $admin->save();
 
         if ($request->roles) {
@@ -232,5 +234,82 @@ class AdminsController extends Controller
         }
 
         return Excel::download(new AdminsExport, 'admins_list.xlsx');
+    }
+
+    /**
+     * Assign users to an admin
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function toggleBlock($id)
+    {
+        if (is_null($this->user) || !$this->user->can('admin.edit')) {
+            abort(403, 'Sorry !! You are Unauthorized to block/unblock any admin !');
+        }
+
+        $admin = Admin::find($id);
+        if (is_null($admin)) {
+            abort(404, 'Admin not found !');
+        }
+
+        $admin->is_blocked = !$admin->is_blocked;
+        $admin->save();
+
+        $status = $admin->is_blocked ? 1 : 0;
+        session()->flash('success', "Admin has been {$status} successfully!");
+        return back();
+    }
+
+    public function bulkBlock(Request $request)
+    {
+        if (is_null($this->user) || !$this->user->can('admin.edit')) {
+            abort(403, 'Sorry !! You are Unauthorized to block/unblock any admin !');
+        }
+
+        $request->validate([
+            'admin_ids' => 'required|array',
+            'admin_ids.*' => 'integer',
+            'action' => 'required|in:block,unblock',
+        ]);
+
+        $ids = $request->input('admin_ids', []);
+        $action = $request->input('action');
+        $isBlocked = $action === 'block' ? true : false;
+
+        // Exclude super admin (id=1) from bulk operations
+        $ids = array_filter($ids, fn($id) => $id != 1);
+
+        Admin::whereIn('id', $ids)->update(['is_blocked' => $isBlocked]);
+
+        $count = count($ids);
+        session()->flash('success', "{$count} admin(s) have been {$action}ed successfully!");
+        return back();
+    }
+
+    public function assignUsers(Request $request, $id)
+    {
+        if (is_null($this->user) || !$this->user->can('admin.edit')) {
+            abort(403, 'Sorry !! You are Unauthorized to assign users to any admin !');
+        }
+
+        $admin = Admin::find($id);
+        if (is_null($admin)) {
+            abort(404, 'Admin not found !');
+        }
+
+        // Get the selected user IDs from the request
+        $assignedUsers = $request->input('assigned_users', []);
+        
+        // Convert array to comma-separated string
+        $assignedUsersStr = !empty($assignedUsers) ? implode(',', $assignedUsers) : '';
+        
+        // Update the admin's assigned_users field
+        $admin->assigned_users = $assignedUsersStr;
+        $admin->save();
+
+        session()->flash('success', 'Users have been assigned to the admin successfully!');
+        return back();
     }
 }

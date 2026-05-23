@@ -5,12 +5,13 @@
             <th style="padding: 5px;">App Id</th>
             <th style="padding: 5px;">Internal Code</th>
             <th style="padding: 5px;">Branch Code</th>
+            <th style="padding: 5px;">Dealer Code</th>
             <th style="padding: 5px;">Name</th>
             <th style="padding: 5px;">Mobile Number</th>
             <th style="padding: 5px;">Address</th>
             <th style="padding: 5px;">City</th>
             <th style="padding: 5px;">FIType</th>
-            <th style="padding: 5px;">Tat Start & End</th>
+            <th style="padding: 5px;">Created At</th>
             @if(auth()->check())
                     @if(auth()->user()->role != 'Bank')
             <th style="padding: 5px;">Agent</th>
@@ -31,6 +32,7 @@
             <td>{{ ($cases->currentPage() - 1) * $cases->perPage() + $loop->iteration }}</td>
             <td>{{ $case->getCase->refrence_number ?? '' }}</td>
             <td>{{ isset($case->getCase->getBranch) ? optional($case->getCase->getBranch)->branch_code. "( ". optional($case->getCase->getBranch)->branch_name . ")" : '' }}</td>
+            <td>{{ isset($case->dealer_code) ? $case->dealer_code : '' }}</td>
             <td>{{ $case->getCase->applicant_name ?? $case->applicant_name }}</td>
             <td>{{ $case->mobile ?? '' }}</td>
             <td style="width: 15%">{{ $case->address ?? '' }}&nbsp;&nbsp;
@@ -68,7 +70,7 @@
             }
             @endphp
             <td>{{ $columnValue }}</td>
-            <td>{{ isset($case->tat_start) ? 'Start: '. humanReadableDate($case->tat_start) . ' End : '.humanReadableDate($case->tat_end) :'' }}</td>
+            <td>{{ isset($case->created_at) ?  humanReadableDate($case->created_at) :'' }}</td>
             @if(auth()->check())
                     @if(auth()->user()->role != 'Bank')
             <td>{{ $case->getUser->name ?? '' }}</td>

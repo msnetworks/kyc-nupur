@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Models\BranchCode;
+use Illuminate\Support\Facades\Artisan;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -22,7 +24,11 @@ Auth::routes();
 
 Route::get('/', 'HomeController@redirectAdmin')->name('index');
 Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/clear-cache', function () {
+    Artisan::call('optimize:clear');
 
+    return "Cache Cleared Successfully";
+});
 /**
  * Admin routes
  */
@@ -106,6 +112,11 @@ Route::group(['prefix' => 'admin'], function () {
     Route::resource('banks', 'Backend\BanksController', ['names' => 'admin.banks']);
     Route::resource('roles', 'Backend\RolesController', ['names' => 'admin.roles']);
     Route::resource('users', 'Backend\UsersController', ['names' => 'admin.users']);
+    Route::get('upload-cards-dashboard', 'Backend\UploadCardsController@dashboard')->name('admin.upload-cards.dashboard');
+    Route::post('upload-cards-dashboard/filter', 'Backend\UploadCardsController@dashboardFilter')->name('admin.upload-cards.dashboard.filter');
+    Route::get('upload-cards/{id}/pdf', 'Backend\UploadCardsController@downloadPdf')->name('admin.upload-cards.download-pdf');
+    Route::patch('upload-cards/{id}/status', 'Backend\UploadCardsController@updateStatus')->name('admin.upload-cards.update-status');
+    Route::resource('upload-cards', 'Backend\UploadCardsController', ['names' => 'admin.upload-cards']);
     Route::get('users/agent/{id}', 'Backend\UsersController@getAgent')->name('admin.users.agent');
     Route::get('users/status/{type}/{parent_id?}', 'Backend\UsersController@getCaseStatus')->name('admin.users.caseStatus');
 
@@ -126,6 +137,9 @@ Route::group(['prefix' => 'admin'], function () {
     })->name('get.branches'); 
     // Route::get('users/agent/{id}', 'Backend\UsersController@getAgent')->name('admin.users.agent');
     Route::get('admins/export', 'Backend\AdminsController@export')->name('admin.admins.export');
+    Route::post('admins/{id}/assign-users', 'Backend\AdminsController@assignUsers')->name('admin.admins.assignUsers');
+    Route::post('admins/{id}/toggle-block', 'Backend\AdminsController@toggleBlock')->name('admin.admins.toggleBlock');
+    Route::post('admins/bulk-block', 'Backend\AdminsController@bulkBlock')->name('admin.admins.bulkBlock');
     Route::resource('admins', 'Backend\AdminsController', ['names' => 'admin.admins']);
 
     // Login Routes
