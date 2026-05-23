@@ -92,13 +92,21 @@
     <table class="table table-bordered" border="2">
         <thead>
             <tr>
-                <td style="border:none; font-size:22px; color:#000;" align="center" colspan="2">
+                {{-- <td style="border:none; font-size:22px; color:#000;" align="center" colspan="2">
                     <img style="width: 180px; max-height: 120px;" alt="Synergee Risk Management Pvt. Ltd." src="{{ $logo }}">
                 </td>
                 <td class="address_text" align="center" colspan="2">
                     <h5 style="color: #ff0000; margin-bottom: 0;"><u>
                         Synergee Risk Management Pvt. Ltd.</u></h5>
                         <small>G-75, Jagjeet Nagar, East Delhi, Delhi, India, 110053</small>
+                </td> --}}
+                <td style="border:none; font-size:22px; color:#000;" align="center" colspan="2">
+                    <img style="height: 80px;" alt="{{ $case->getCase->bank_id == 13 || $case->getCase->bank_id == 12 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }}" src="{{ $logo }}">
+                </td>
+                <td class="address_text" align="center" colspan="2">
+                    <h2 style="color: #ff0000; margin-bottom: 0;"><u>
+                        <i>{{ $case->getCase->bank_id == 13 || $case->getCase->bank_id == 12 ? 'SK ENTERPRISES' : 'TIGER 4 INDIA LTD' }}</i></u></h2>
+                        <small>{{ $case->getCase->bank_id == 13 || $case->getCase->bank_id == 12 ? 'No 752, Sainik Vihar, Saradhana Road, Kanker Khera, Meerut Uttar Pradesh - 250001' : 'VASANT KUNJ NEW DELHI-110070' }}</small>
                 </td>
             </tr>
         </thead>

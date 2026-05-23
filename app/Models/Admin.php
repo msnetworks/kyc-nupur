@@ -25,7 +25,7 @@ class Admin extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'mobile', 'password', 'parent_id',
+        'name', 'email', 'mobile', 'password', 'parent_id', 'assigned_users', 'is_blocked',
     ];
 
     /**
@@ -96,4 +96,29 @@ class Admin extends Authenticatable
     {
         return $this->belongsTo('App\Models\Admin', 'parent_id', 'id');
     }
+
+    /**
+     * Get all assigned users for this admin
+     */
+    public function assignedUsers()
+    {
+        try {
+            if (!$this->assigned_users || empty(trim($this->assigned_users))) {
+                return collect();
+            }
+            
+            $userIds = explode(',', trim($this->assigned_users));
+            $userIds = array_filter(array_map('intval', $userIds));
+            
+            if (empty($userIds)) {
+                return collect();
+            }
+            
+            return \App\User::whereIn('id', $userIds)->get();
+        } catch (\Exception $e) {
+            \Log::error('Error fetching assigned users: ' . $e->getMessage());
+            return collect();
+        }
+    }
 }
+

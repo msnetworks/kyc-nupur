@@ -93,7 +93,6 @@ class CasesController extends Controller
         $ApplicationTypes   = ApplicationType::where('status', '1')->get();
         $session_id         = Auth::guard('admin')->user()->id;
         $users              = User::where('admin_id', $session_id)->get();
-
  
         $fitypesFeild = '';
         $AgentsFeild = '';
@@ -119,7 +118,21 @@ class CasesController extends Controller
 
             $fitypesFeild .= '</div>';
         }
-        return view('backend.pages.cases.create', compact('banks', 'roles', 'fitypes', 'fitypesFeild', 'ApplicationTypes'));
+        
+        // Get assigned users for the current admin
+        $currentAdmin = Auth::guard('admin')->user();
+        $assignedUsers = collect();
+        
+        if ($currentAdmin) {
+            try {
+                $assignedUsers = $currentAdmin->assignedUsers();
+            } catch (\Exception $e) {
+                \Log::error('Error in CasesController create: ' . $e->getMessage());
+                $assignedUsers = collect();
+            }
+        }
+
+        return view('backend.pages.cases.create', compact('banks', 'roles', 'fitypes', 'fitypesFeild', 'ApplicationTypes', 'assignedUsers'));
     }
 
     /**
@@ -237,8 +250,14 @@ class CasesController extends Controller
                     $aadharNumber = 'aadhar_number' . $fi_type_id['id'];
                     $casesFiType->aadhar_card = $request->$aadharNumber;
                 }
-                $casesFiType->status       = $user->role == 'Bank' ? '1' : '0';
-                $casesFiType->user_id       = $user->role == 'Bank' ? $user->default_agent_assign : '0';
+                if (!empty($request->assigned_user_id)){
+                    $casesFiType->status       = '1';
+                    $casesFiType->user_id       = $request->assigned_user_id;
+                }
+                else{
+                    $casesFiType->status       = $user->role == 'Bank' ? '1' : '0';
+                    $casesFiType->user_id       = $user->role == 'Bank' ? $user->default_agent_assign : '0';
+                }
                 $casesFiType->save();
             }
         }
@@ -1589,7 +1608,14 @@ class CasesController extends Controller
                 $query->whereHas('getCase', function ($casequery) use ($search) {
                     $casequery->where('refrence_number', 'LIKE', "%$search%")
                         ->orWhere('applicant_name', 'LIKE', "%$search%");
-                })->orWhere('mobile', 'LIKE', "%$search%");
+                })->orWhere('mobile', 'LIKE', "%$search%")
+                  ->orWhere('dealer_code', 'LIKE', "%$search%")
+                  ->orWhereHas('getFiType', function ($query) use ($search) {
+                      $query->where('name', 'LIKE', "%$search%");
+                  })
+                  ->orWhereHas('getCase.getBank', function ($bankQuery) use ($search) {
+                        $bankQuery->where('name', 'LIKE', "%$search%");
+                    });
             });
         }
 
@@ -2488,7 +2514,7 @@ class CasesController extends Controller
         $caseFi->guarantor = $input['guarantor'] ?? null;
         $caseFi->assessment_year = $input['assessment_year'] ?? null;
         $caseFi->form16_issued = $input['form16_issued'] ?? null;
-        $caseFi->tax_matched = $input['tax_matched'];
+        $caseFi->tax_matched = $input['tax_matched'] ?? null;
         $caseFi->pan_number = $input['pan_number'];
         $caseFi->total_income_verification = $input['total_income_verification'];
         $caseFi->income_amount = $input['income_amount'];
@@ -2610,7 +2636,9 @@ class CasesController extends Controller
             $dompdf->render();
 
             // Generate filename
-            $fileName = 'case_' . date('Y-m-d_H-i-s') . '.pdf';
+            $applicantName = $this->sanitizePdfFileNamePart($case->getCase->applicant_name ?? 'case');
+            $fiTypeName = $this->sanitizePdfFileNamePart($case->getFiType->name ?? 'report');
+            $fileName = $applicantName . '_' . $fiTypeName . '.pdf';
 
             // Get PDF content
             $output = $dompdf->output();
@@ -2640,6 +2668,14 @@ class CasesController extends Controller
             // Return error response
             return back()->with('error', 'Error generating PDF: ' . $e->getMessage());
         }
+    }
+
+    private function sanitizePdfFileNamePart(?string $value): string
+    {
+        $value = preg_replace('/[^A-Za-z0-9\s_-]/', '', $value ?? '');
+        $value = preg_replace('/[\s_-]+/', '_', trim($value, " \t\n\r\0\x0B_-"));
+
+        return $value !== '' ? $value : 'case';
     }
 
     public function telecallerForm($id = null)

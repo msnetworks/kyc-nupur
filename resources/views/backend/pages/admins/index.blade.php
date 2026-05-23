@@ -1,5 +1,6 @@
 @extends('backend.layouts.master')
 
+
 @section('title')
 Admins - Admin Panel
 @endsection
@@ -54,11 +55,29 @@ Admins - Admin Panel
                         @endif
                     </div>
                     <div class="clearfix"></div>
+                    @if (Auth::guard('admin')->user()->can('admin.edit'))
+                    <form id="bulkBlockForm" action="{{ route('admin.admins.bulkBlock') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="action" id="bulkAction" value="block">
+                        <div class="mb-3" id="bulkActions" style="display: none;">
+                            <span id="selectedCount" class="mr-2 font-weight-bold">0 selected</span>
+                            <button type="submit" class="btn btn-warning btn-sm mr-1" onclick="document.getElementById('bulkAction').value='block'">
+                                <i class="fa fa-ban"></i> Block Selected
+                            </button>
+                            <button type="submit" class="btn btn-success btn-sm" onclick="document.getElementById('bulkAction').value='unblock'">
+                                <i class="fa fa-unlock"></i> Unblock Selected
+                            </button>
+                        </div>
+                    </form>
+                    @endif
                     <div class="data-tables">
                         @include('backend.layouts.partials.messages')
                         <table id="dataTable" class="text-center">
                             <thead class="bg-light text-capitalize">
                                 <tr>
+                                    @if (Auth::guard('admin')->user()->can('admin.edit'))
+                                    <th width="3%"><input type="checkbox" id="selectAll"></th>
+                                    @endif
                                     <th width="5%">Sl</th>
                                     <th width="10%">Name</th>
                                     <th width="10%">UserName</th>
@@ -67,6 +86,7 @@ Admins - Admin Panel
                                     <th width="20%">Password</th>
                                     <th width="20%">Roles</th>
                                     <th width="20%">Banks</th>
+                                    <th width="20%">Assigned Users</th>
                                     <th width="15%">Action</th>
                                 </tr>
                             </thead>
@@ -74,8 +94,15 @@ Admins - Admin Panel
                                 @foreach ($admins as $admin)
                                 @if($admin->id != 1)
                                 <tr>
+                                    @if (Auth::guard('admin')->user()->can('admin.edit'))
+                                    <td><input type="checkbox" class="admin-checkbox" form="bulkBlockForm" name="admin_ids[]" value="{{ $admin->id }}"></td>
+                                    @endif
                                     <td>{{ $loop->index }}</td>
-                                    <td>{{ $admin->name }}</td>
+                                    <td>{{ $admin->name }}
+                                        @if($admin->is_blocked)
+                                            <span class="badge badge-danger">Blocked</span>
+                                        @endif
+                                    </td>
                                     <td>{{ $admin->username }}</td>
                                     <td>{{ $admin->email }}</td>
                                     <td>{{ $admin->mobile }}</td>
@@ -101,25 +128,74 @@ Admins - Admin Panel
                                         @endforeach
                                     </td>
                                     <td>
-                                        @if (Auth::guard('admin')->user()->can('admin.edit'))
-                                        <a class="btn btn-success text-white" href="{{ route('admin.admins.edit', $admin->id) }}">Edit</a>
-                                        @endif
-
-                                        @if (Auth::guard('admin')->user()->can('admin.delete'))
-                                        <a class="btn btn-danger text-white" href="{{ route('admin.admins.destroy', $admin->id) }}" onclick="event.preventDefault(); document.getElementById('delete-form-{{ $admin->id }}').submit();">
-                                            Delete
-                                        </a>
-                                        <form id="delete-form-{{ $admin->id }}" action="{{ route('admin.admins.destroy', $admin->id) }}" method="POST" style="display: none;">
-                                            @method('DELETE')
-                                            @csrf
-                                        </form>
+                                        @php
+                                            $assignedUserIds = explode(',', trim($admin->assigned_users ?? ''));
+                                            $assignedUsers = !empty($assignedUserIds[0]) ? DB::table('users')->whereIn('id', $assignedUserIds)->get() : collect();
+                                        @endphp
+                                        @if($assignedUsers->isEmpty())
+                                            <span class="badge badge-secondary">None</span>
+                                        @else
+                                            @foreach ($assignedUsers->take(2) as $user)
+                                                <span class="badge badge-success mr-1">
+                                                    {{ $user->name }}
+                                                </span>
+                                            @endforeach
+                                            @if($assignedUsers->count() > 2)
+                                                <button class="btn btn-sm btn-outline-primary m-2" data-toggle="modal" data-target="#viewAllUsersModal-{{ $admin->id }}">
+                                                    View More ({{ $assignedUsers->count() - 2 }})
+                                                </button>
+                                            @endif
                                         @endif
                                     </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton-{{ $admin->id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <i class="fa fa-cog"></i> Actions
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton-{{ $admin->id }}">
+                                                @if (Auth::guard('admin')->user()->can('admin.edit'))
+                                                <a class="dropdown-item" href="{{ route('admin.admins.edit', $admin->id) }}">
+                                                    <i class="fa fa-edit"></i> Edit
+                                                </a>
+                                                <a class="dropdown-item" href="#" data-assign-users-btn data-admin-id="{{ $admin->id }}" data-admin-name="{{ $admin->name }}" data-assigned-users="{{ $admin->assigned_users ?? '' }}" onclick="quickOpenModal({{ $admin->id }}, '{{ $admin->name }}', '{{ $admin->assigned_users ?? '' }}'); return false;">
+                                                    <i class="fa fa-users"></i> Assign Users
+                                                </a>
+                                                @endif
+
+                                                @if (Auth::guard('admin')->user()->can('admin.edit'))
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item {{ $admin->is_blocked ? 'text-success' : 'text-warning' }}" href="#" onclick="event.preventDefault(); document.getElementById('block-form-{{ $admin->id }}').submit();">
+                                                    <i class="fa {{ $admin->is_blocked ? 'fa-unlock' : 'fa-ban' }}"></i> {{ $admin->is_blocked ? 'Unblock' : 'Block' }}
+                                                </a>
+                                                <form id="block-form-{{ $admin->id }}" action="{{ route('admin.admins.toggleBlock', $admin->id) }}" method="POST" style="display: none;">
+                                                    @csrf
+                                                </form>
+                                                @endif
+
+                                                @if (Auth::guard('admin')->user()->can('admin.delete'))
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item text-danger" href="{{ route('admin.admins.destroy', $admin->id) }}" onclick="event.preventDefault(); document.getElementById('delete-form-{{ $admin->id }}').submit();">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                                <form id="delete-form-{{ $admin->id }}" action="{{ route('admin.admins.destroy', $admin->id) }}" method="POST" style="display: none;">
+                                                    @method('DELETE')
+                                                    @csrf
+                                                </form>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </td>
                                 </tr>
-                                        @endif
+                                @endif
                                 @endforeach
                             </tbody>
                         </table>
+                        <!-- Store admin data for JavaScript -->
+                        @foreach ($admins as $admin)
+                            @if($admin->id != 1)
+                            <div style="display:none;" data-admin-id="{{ $admin->id }}" data-admin-name="{{ $admin->name }}" data-assigned-users="{{ $admin->assigned_users ?? '' }}"></div>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
             </div>
@@ -128,10 +204,82 @@ Admins - Admin Panel
 
     </div>
 </div>
+
+<!-- Single Reusable Modal for Assigning Users -->
+<div class="modal fade" id="assignUsersModal" tabindex="-1" role="dialog" aria-labelledby="assignUsersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignUsersModalLabel">Assign Users</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="assignUsersForm" action="" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label><strong>Select Users:</strong></label>
+                        <input type="text" class="form-control mb-3" id="userSearch" placeholder="Search users...">
+                        <div class="user-list" id="userList" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 4px;">
+                            <!-- Users will be loaded here via JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- View All Assigned Users Modals -->
+@foreach ($admins as $admin)
+    @if($admin->id != 1)
+        @php
+            $assignedUserIds = explode(',', trim($admin->assigned_users ?? ''));
+            $assignedUsers = !empty($assignedUserIds[0]) ? DB::table('users')->whereIn('id', $assignedUserIds)->get() : collect();
+        @endphp
+        @if($assignedUsers->count() > 2)
+        <div class="modal fade" id="viewAllUsersModal-{{ $admin->id }}" tabindex="-1" role="dialog" aria-labelledby="viewAllUsersModalLabel-{{ $admin->id }}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="viewAllUsersModalLabel-{{ $admin->id }}">Assigned Users - {{ $admin->name }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="list-group">
+                            @foreach ($assignedUsers as $user)
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-0">{{ $user->name }}</h6>
+                                            <small class="text-muted">{{ $user->email }}</small>
+                                        </div>
+                                        <span class="badge badge-success">Active</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+    @endif
+@endforeach
 @endsection
+<!-- jQuery (required for Bootstrap and DataTables) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-
-@section('scripts')
 <!-- Start datatable js -->
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js"></script>
 <script src="https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js"></script>
@@ -140,13 +288,166 @@ Admins - Admin Panel
 <script src="https://cdn.datatables.net/responsive/2.2.3/js/responsive.bootstrap.min.js"></script>
 
 <script>
-    /*================================
-        datatable active
-        ==================================*/
-    if ($('#dataTable').length) {
-        $('#dataTable').DataTable({
-            responsive: true
+    // Global variables for modal
+    let currentAdminId = null;
+    let allUsersData = [];
+    let adminData = {}; // Store admin info by ID
+
+    // Load users on page load
+    $(document).ready(function() {
+        /*================================
+            datatable active
+            ==================================*/
+        if ($('#dataTable').length) {
+            $('#dataTable').DataTable();
+        }
+
+        loadAllUsers();
+        loadAdminData();
+        setupEventHandlers();
+    });
+
+    // Load all users once from controller
+    function loadAllUsers() {
+        allUsersData = {!! json_encode($users) !!};
+        console.log('Users loaded:', allUsersData.length);
+    }
+
+    // Load admin data from hidden divs
+    function loadAdminData() {
+        $('[data-admin-id]').each(function() {
+            const adminId = $(this).data('admin-id');
+            adminData[adminId] = {
+                name: $(this).data('admin-name'),
+                assignedUsers: $(this).data('assigned-users') || ''
+            };
+        });
+        console.log('Admin data loaded:', adminData);
+    }
+
+    // Setup event handlers
+    function setupEventHandlers() {
+        // Handle modal open from dropdown
+        $(document).on('click', '[data-assign-users-btn]', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const adminId = $(this).data('admin-id');
+            console.log('Opening modal for admin:', adminId);
+            console.log('Admin data:', adminData[adminId]);
+            
+            if (allUsersData.length === 0) {
+                console.error('No users loaded!');
+                alert('Error: Users data not loaded');
+                return;
+            }
+            
+            openAssignUsersModal(adminId);
+            
+            // Show modal using Bootstrap 4
+            try {
+                $('#assignUsersModal').modal('show');
+                console.log('Modal should now be visible');
+            } catch(err) {
+                console.error('Error showing modal:', err);
+                alert('Error opening modal. Please check browser console.');
+            }
+        });
+
+        // Search users
+        $(document).on('keyup', '#userSearch', function() {
+            searchUsers();
         });
     }
+
+    // Open assign users modal
+    function openAssignUsersModal(adminId) {
+        currentAdminId = adminId;
+        const admin = adminData[adminId] || {};
+        
+        $('#assignUsersModalLabel').text('Assign Users to ' + (admin.name || 'Admin'));
+        $('#assignUsersForm').attr('action', '/admin/admins/' + adminId + '/assign-users');
+        
+        // Get currently assigned users for this admin
+        const assignedUserIds = admin.assignedUsers ? admin.assignedUsers.split(',').map(Number) : [];
+        
+        // Render user list
+        renderUserList(allUsersData, assignedUserIds);
+    }
+
+    // Render user list
+    function renderUserList(users, assignedIds = []) {
+        let html = '';
+        users.forEach(user => {
+            const isChecked = assignedIds.includes(user.id) ? 'checked' : '';
+            html += `
+                <div class="form-check mt-2">
+                    <input class="form-check-input user-checkbox" type="checkbox" name="assigned_users[]" value="${user.id}" 
+                        id="user-${currentAdminId}-${user.id}" ${isChecked}>
+                    <label class="form-check-label" for="user-${currentAdminId}-${user.id}">
+                        ${user.name} (${user.email})
+                    </label>
+                </div>
+            `;
+        });
+        $('#userList').html(html);
+    }
+
+    // Search users
+    function searchUsers() {
+        const searchTerm = $('#userSearch').val().toLowerCase();
+        const filteredUsers = allUsersData.filter(user => 
+            user.name.toLowerCase().includes(searchTerm) || 
+            user.email.toLowerCase().includes(searchTerm)
+        );
+        
+        const admin = adminData[currentAdminId] || {};
+        const assignedUserIds = admin.assignedUsers ? admin.assignedUsers.split(',').map(Number) : [];
+        
+        renderUserList(filteredUsers, assignedUserIds);
+    }
+
+    // Quick open modal function
+    function quickOpenModal(adminId, adminName, assignedUsersStr) {
+        console.log('Quick opening modal for admin:', adminId, adminName);
+        currentAdminId = adminId;
+        
+        $('#assignUsersModalLabel').text('Assign Users to ' + adminName);
+        $('#assignUsersForm').attr('action', '/admin/admins/' + adminId + '/assign-users');
+        
+        const assignedIds = assignedUsersStr ? assignedUsersStr.split(',').map(Number) : [];
+        renderUserList(allUsersData, assignedIds);
+        
+        $('#assignUsersModal').modal('show');
+    }
+
+    // Clear search when modal closes
+    $('#assignUsersModal').on('hidden.bs.modal', function() {
+        $('#userSearch').val('');
+        currentAdminId = null;
+    });
+
+    // Bulk select functionality
+    function updateBulkActions() {
+        const checked = $('.admin-checkbox:checked').length;
+        $('#selectedCount').text(checked + ' selected');
+        if (checked > 0) {
+            $('#bulkActions').show();
+        } else {
+            $('#bulkActions').hide();
+        }
+    }
+
+    $('#selectAll').on('change', function() {
+        $('.admin-checkbox').prop('checked', this.checked);
+        updateBulkActions();
+    });
+
+    $(document).on('change', '.admin-checkbox', function() {
+        if (!this.checked) {
+            $('#selectAll').prop('checked', false);
+        } else if ($('.admin-checkbox:checked').length === $('.admin-checkbox').length) {
+            $('#selectAll').prop('checked', true);
+        }
+        updateBulkActions();
+    });
 </script>
-@endsection

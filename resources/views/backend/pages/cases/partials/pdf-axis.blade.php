@@ -91,10 +91,14 @@
 <div class="col-xs-12" style="width: 100%; max-width: 100%; margin: 0; padding: 5px; border: 2px solid #9d1d3f;">
     <table class="table table-bordered" border="2">
         <tbody>
-            <tr class="axis-head">
-                <td colspan="4" class="text-center">
-                    <h2 class="axis-title">Axis Bank - Field Credit Unit Report</h2>
-                    <div class="axis-meta">Strictly Private &amp; Confidential</div>
+            <tr>
+                <td style="border:none; font-size:22px; color:#000;" align="center" colspan="2">
+                    <img style="width: 180px; max-height: 120px;" alt="{{ $sign_title }}" src="{{ $logo }}">
+                </td>
+                <td class="address_text" align="center" colspan="2">
+                    <h5 style="color: #9d1d3f; margin-bottom: 0;"><u>
+                        {{ $sign_title }}</u></h5>
+                        <small>{{ $address }}</small>
                 </td>
             </tr>
         </tbody>
